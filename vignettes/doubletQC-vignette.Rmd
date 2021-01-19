@@ -1,0 +1,19 @@
+---
+title: "doubletQC vignette"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{doubletQC vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(dropletQC)
+```

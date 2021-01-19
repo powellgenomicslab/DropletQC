@@ -1,27 +1,30 @@
-#' Parse CB and RE tags in input region of barcoded BAM file
+#'Parse CB and RE tags in input region of barcoded BAM file
 #'
-#' @description
-#' This function accepts three inputs; a GRanges defining a genomic interval, a reference to a Cell Ranger Barcoded BAM file and a vector of cell barcodes.
-#' It then uses uses `Rsamtools::scanBam()` to import the Cell Ranger Barcoded BAM Alignment Tags:
-#' CB - error-corrected cell barcode
-#' RE - region type (E = exonic, N = intronic, I = intergenic)
-#' parse them and return a data frame with three integer columns; E, I and N.
+#'@description This function accepts three inputs; a GRanges defining a genomic
+#'interval, a reference to a Cell Ranger Barcoded BAM file and a vector of cell
+#'barcodes. It then uses uses `Rsamtools::scanBam()` to import the Cell Ranger
+#'Barcoded BAM Alignment Tags: CB - error-corrected cell barcode RE - region
+#'type (E = exonic, N = intronic, I = intergenic) parse them and return a data
+#'frame with three integer columns; E, I and N.
 #'
-#' @param interval
-#' a single GRanges defining a genomic interval to import reads from
-#' @param bam
-#' a reference to a Cell Ranger Barcoded BAM file to pull reads from (Rsamtools::BamFile())
-#' @param bc
-#'a character vector of cell barcodes of interest
+#'@param interval a single GRanges defining a genomic interval to import reads
+#'  from
+#'@param bam a reference to a Cell Ranger Barcoded BAM file to pull reads from
+#'  (Rsamtools::BamFile())
+#'@param bc a character vector of cell barcodes of interest
 #'
-#' @return data.frame
-#' returns a data frame with three integer columns;
-#' E - the number of reads that map to exons in the requested genomic interval for each cell barcode
-#' I - the number of reads that map to intergenic regions
-#' N - the number of reads that map to introns
-#' where the rows are in the same order as the input character vector of cell barcodes. If there are no reads in the interval requested, the function will return NULL. This function was written as a helper function to be called internally by `dropletQC::nuclear_fraction` and isn't intended for more general use.
+#'@return data.frame returns a data frame with three integer columns; E - the
+#'  number of reads that map to exons in the requested genomic interval for each
+#'  cell barcode I - the number of reads that map to intergenic regions N - the
+#'  number of reads that map to introns where the rows are in the same order as
+#'  the input character vector of cell barcodes. If there are no reads in the
+#'  interval requested, the function will return NULL. This function was written
+#'  as a helper function to be called internally by
+#'  `dropletQC::nuclear_fraction` and isn't intended for more general use.
 #'
-#' @export
+#'@export
+#'
+#'@keywords internal
 #'
 #' @examples
 #' #parse_bam(interval = genome_tiles[1], bam = bam_file, bc = barcodes)

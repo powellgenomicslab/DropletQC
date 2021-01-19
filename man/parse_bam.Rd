@@ -7,27 +7,33 @@
 parse_bam(interval, bam, bc)
 }
 \arguments{
-\item{interval}{a single GRanges defining a genomic interval to import reads from}
+\item{interval}{a single GRanges defining a genomic interval to import reads
+from}
 
-\item{bam}{a reference to a Cell Ranger Barcoded BAM file to pull reads from (Rsamtools::BamFile())}
+\item{bam}{a reference to a Cell Ranger Barcoded BAM file to pull reads from
+(Rsamtools::BamFile())}
 
 \item{bc}{a character vector of cell barcodes of interest}
 }
 \value{
-data.frame
-returns a data frame with three integer columns;
-E - the number of reads that map to exons in the requested genomic interval for each cell barcode
-I - the number of reads that map to intergenic regions
-N - the number of reads that map to introns
-where the rows are in the same order as the input character vector of cell barcodes. If there are no reads in the interval requested, the function will return NULL. This function was written as a helper function to be called internally by \code{dropletQC::nuclear_fraction} and isn't intended for more general use.
+data.frame returns a data frame with three integer columns; E - the
+number of reads that map to exons in the requested genomic interval for each
+cell barcode I - the number of reads that map to intergenic regions N - the
+number of reads that map to introns where the rows are in the same order as
+the input character vector of cell barcodes. If there are no reads in the
+interval requested, the function will return NULL. This function was written
+as a helper function to be called internally by
+\code{dropletQC::nuclear_fraction} and isn't intended for more general use.
 }
 \description{
-This function accepts three inputs; a GRanges defining a genomic interval, a reference to a Cell Ranger Barcoded BAM file and a vector of cell barcodes.
-It then uses uses \code{Rsamtools::scanBam()} to import the Cell Ranger Barcoded BAM Alignment Tags:
-CB - error-corrected cell barcode
-RE - region type (E = exonic, N = intronic, I = intergenic)
-parse them and return a data frame with three integer columns; E, I and N.
+This function accepts three inputs; a GRanges defining a genomic
+interval, a reference to a Cell Ranger Barcoded BAM file and a vector of cell
+barcodes. It then uses uses \code{Rsamtools::scanBam()} to import the Cell Ranger
+Barcoded BAM Alignment Tags: CB - error-corrected cell barcode RE - region
+type (E = exonic, N = intronic, I = intergenic) parse them and return a data
+frame with three integer columns; E, I and N.
 }
 \examples{
 #parse_bam(interval = genome_tiles[1], bam = bam_file, bc = barcodes)
 }
+\keyword{internal}

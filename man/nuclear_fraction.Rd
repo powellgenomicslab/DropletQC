@@ -10,40 +10,81 @@ nuclear_fraction(
   bam_index = paste0(bam, ".bai"),
   barcodes = NULL,
   cores = future::availableCores() - 1,
-  tiles = 1000,
+  tiles = 100,
   verbose = TRUE
 )
 }
 \arguments{
-\item{outs}{the path to the 'outs' directory created by Cell Ranger. We assume outs is structured this way:}
+\item{outs}{character, the path to the 'outs' directory created by Cell
+Ranger. We assume outs is structured this way:
 
-\item{bam}{character
-the path to the input bam file. Not required if the 'outs' directory is provided.}
+├── filtered_feature_bc_matrix
 
-\item{bam_index}{character
-the path to the input bam file index. Not required if the 'outs' directory is provided.}
+│   ├── barcodes.tsv.gz
 
-\item{barcodes}{character
-the path to the barcodes.tsv.gz file output by Cell Ranger. Rather than provide the path to a file on disk you can alternatively provide a vector of barcode names. If providing the cell barocodes as a vector, make sure that the format matches the one in the BAM file - be mindful of the "-1" at the end of the barcode sequence. This argument isn't required if the 'outs' directory is provided - the function will just look for "barcodes.tsv.gz" in outs/filtered_feature_bc_matrix/}
+│   ├── features.tsv.gz
 
-\item{cores}{numeric
-runs the function in parallel using furrr:future_map() with the requested number of cores. Setting \code{cores=1} will cause future_map to run sequentially.}
+│   └── matrix.mtx.gz
 
-\item{tiles}{numeric
-to speed up the processing of the BAM file we can split the genome up into tiles and process reads in chunks}
+├── possorted_genome_bam.bam
 
-\item{verbose}{logical
-whether or not to print progress}
+├── possorted_genome_bam.bam.bai
+
+├── raw_feature_bc_matrix
+
+│   ├── barcodes.tsv.gz
+
+│   ├── features.tsv.gz
+
+│   └── matrix.mtx.gz
+
+Note that there will probably be other files in the directory as well. We
+don't need to worry about those, as the only three files that the function
+will require are; possorted_genome_bam.bam, possorted_genome_bam.bam.bai and
+filtered_feature_bc_matrix/barcodes.tsv.gz. This is the only required
+argument for the function. If your directory structure no longer matches the
+one created by Cell Ranger (e.g. you were given the files from a
+collaborator or sequencing facility) you can provide the file paths directly
+using the bam, bam_index and barcodes arguments.}
+
+\item{bam}{character, the path to the input bam file. Not required if the
+'outs' directory is provided.}
+
+\item{bam_index}{character, the path to the input bam file index. Not required
+if the 'outs' directory is provided.}
+
+\item{barcodes}{character, the path to the barcodes.tsv.gz file output by Cell
+Ranger. Rather than provide the path to a file on disk you can alternatively
+provide a vector of barcode names. If providing the cell barocodes as a
+vector, make sure that the format matches the one in the BAM file - be
+mindful of the "-1" at the end of the barcode sequence. This argument isn't
+required if the 'outs' directory is provided - the function will just look
+for "barcodes.tsv.gz" in outs/filtered_feature_bc_matrix}
+
+\item{cores}{numeric, runs the function in parallel using furrr:future_map()
+with the requested number of cores. Setting \code{cores=1} will cause future_map
+to run sequentially.}
+
+\item{tiles}{numeric, to speed up the processing of the BAM file we can split
+the genome up into tiles and process reads in chunks}
+
+\item{verbose}{logical, whether or not to print progress}
 }
 \value{
-data.frame
-the function returns a 1-column data frame containing the calculated nuclear fraction statistic for each input barcode. The order and names of the rows will match those of the input cell barcodes.
+data.frame, the function returns a 1-column data frame containing the
+calculated nuclear fraction statistic for each input barcode. The order and
+names of the rows will match those of the input cell barcodes.
 }
 \description{
-This function uses the RE tags in the Cell Ranger Barcoded BAM file to calculate for each input cell barcode nuclear fraction statistic. This is just the fraction of reads that are intronic:
+This function uses the RE tags in the Cell Ranger Barcoded BAM
+file to calculate for each input cell barcode nuclear the fraction statistic.
+This is just the fraction of reads that are intronic:
+
 nuclear fraction = # intronic reads / (# intronic reads + # of exonic reads)
-The row names of the returned data frame will match the order and name of the supplied barcodes.
-As a minimum we can provide as input a directory containing cellranger the output (outs).
+
+The row names of the returned data frame will match the order and name of the
+supplied barcodes. As a minimum you can provide as input a directory
+containing cellranger the output (outs).
 }
 \examples{
 #nuclear_fraction(outs = "./outs")
