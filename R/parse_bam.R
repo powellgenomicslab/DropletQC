@@ -22,12 +22,9 @@
 #'  as a helper function to be called internally by
 #'  `dropletQC::nuclear_fraction` and isn't intended for more general use.
 #'
-#'@export
 #'
 #'@keywords internal
 #'
-#' @examples
-#' #parse_bam(interval = genome_tiles[1], bam = bam_file, bc = barcodes)
 parse_bam <- function(interval, bam, bc){
 
   # Import reads

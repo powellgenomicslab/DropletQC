@@ -25,12 +25,8 @@
 #'  The first element may take one of three possible values; "error", "warning",
 #'  "pass". The second element is a message with provides extra details about
 #'  any warnings/errors.
-#'@export
 #'
 #'@keywords internal
-#'
-#' @examples
-#' check_bam("path/to/possorted_genome_bam.bam")
 #'
 check_bam <- function(bam_path){
 

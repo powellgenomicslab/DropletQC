@@ -33,8 +33,4 @@ a "warning" is returned as the forst value. Note that the function was written
 as a simple helper function to be called internally by
 \code{doubletQC::nuclear_fraction()} and isn't intended for more general use.
 }
-\examples{
-check_bam("path/to/possorted_genome_bam.bam")
-
-}
 \keyword{internal}

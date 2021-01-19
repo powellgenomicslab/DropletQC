@@ -33,7 +33,4 @@ Barcoded BAM Alignment Tags: CB - error-corrected cell barcode RE - region
 type (E = exonic, N = intronic, I = intergenic) parse them and return a data
 frame with three integer columns; E, I and N.
 }
-\examples{
-#parse_bam(interval = genome_tiles[1], bam = bam_file, bc = barcodes)
-}
 \keyword{internal}

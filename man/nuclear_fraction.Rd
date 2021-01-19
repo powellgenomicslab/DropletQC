@@ -87,5 +87,8 @@ supplied barcodes. As a minimum you can provide as input a directory
 containing cellranger the output (outs).
 }
 \examples{
-#nuclear_fraction(outs = "./outs")
+nf <- nuclear_fraction(outs = system.file("extdata", "outs", package =
+"dropletQC"), tiles = 10, cores = 1, verbose = FALSE)
+head(nf)
+
 }

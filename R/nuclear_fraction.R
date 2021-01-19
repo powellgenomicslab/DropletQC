@@ -67,7 +67,10 @@
 #'@export
 #'
 #' @examples
-#' #nuclear_fraction(outs = "./outs")
+#' nf <- nuclear_fraction(outs = system.file("extdata", "outs", package =
+#' "dropletQC"), tiles = 10, cores = 1, verbose = FALSE)
+#' head(nf)
+#'
 nuclear_fraction <- function(outs="outs",
                              bam=NULL,
                              bam_index=paste0(bam,".bai"),
