@@ -1,15 +1,22 @@
 Package: dropletQC
 Title: Calculate Nuclear Fraction Score
 Version: 0.0.0.9000
-Authors@R: Walter Muskovic
-    person(given = "First",
-           family = "Last",
+Authors@R:
+    person(given = "Walter",
+           family = "Muskovic",
            role = c("aut", "cre"),
-           email = "first.last@example.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
+           email = "w dot muskovic at gmail dot com")
 Description: The nuclear fraction score is calculated by parsing the input BAM file for the CB and RE flags added by 10x Genomics' Cell Ranger  software. This score quantifies the fraction of RNA in a droplet that likely originated from unspliced pre-mRNA. Sheared cell membranes can release cytoplasmic RNA into solution while the nuclear envelope remains intact. Hence the RNA released from stressed or damaged cells consists mostly of mature cytoplasmic mRNA and is relatively depleted of unspliced nuclear precursor mRNA. Droplets containing only ambient RNA will have a low nuclear fraction score, while damaged cells can be identified by a high score.
+Maintainer: Walter Muskovic <Joe.Developer@some.domain.net>
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
+Imports: 
+    Rsamtools,
+    stats,
+    future,
+    furrr,
+    utils,
+    GenomicRanges

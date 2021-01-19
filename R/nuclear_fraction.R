@@ -1,7 +1,13 @@
-# Define function `nuclear_fraction()` that calls IEN internally and returns a data frame with one column
-# containing the nuclear fraction statistic. The row names of the data frame will match the supplied barcodes.
-# As a minimume we can provide as input a directory containing cellranger the output (outs).
-# We assume outs is structured this way:
+#' Calculate the nuclear fraction statistic
+#'
+#' @description
+#' This function uses the RE tags in the Cell Ranger Barcoded BAM file to calculate for each input cell barcode nuclear fraction statistic. This is just the fraction of reads that are intronic:
+#' nuclear fraction = # intronic reads / (# intronic reads + # of exonic reads)
+#' The row names of the returned data frame will match the order and name of the supplied barcodes.
+#' As a minimum we can provide as input a directory containing cellranger the output (outs).
+#'
+#' @param outs
+#' the path to the 'outs' directory created by Cell Ranger. We assume outs is structured this way:
 #├── filtered_feature_bc_matrix
 #│   ├── barcodes.tsv.gz
 #│   ├── features.tsv.gz
@@ -12,29 +18,32 @@
 #│   ├── barcodes.tsv.gz
 #│   ├── features.tsv.gz
 #│   └── matrix.mtx.gz
-# Only three files; possorted_genome_bam.bam, possorted_genome_bam.bam.bai &
-# filtered_feature_bc_matrix/barcodes.tsv.gz are required. All files must
-# exist if the `outs` argument is given and should be named as above.
-
-# If your directory structure no longer matches the one created by
-# CellRanger (e.g. you were given the files from a collaborator or
-#sequencing facility) you can provide the file paths directly using the
-# bam, bam_index and barcodes arguments.
-
-# For the barcodes argument, rather than provide a path to a file on disk
-# you can alternatively provide character vector of barocodes. The barcodes must
-# match the format of the barcodes in the BAM file.
-
-# To speed up the processing of the BAM file we break the genome up into `tiles` and process
-# them in parallel with furrr:future_map() using `cores` cores. Setting `cores=1` will cause
-# future_map to run sequentially.
-
-
-nuclear_fraction <- function(outs=NULL,
+# Note that there will probably be other files in the directory as well. We don't need to worry about those, as the only three files that the function will require are; possorted_genome_bam.bam, possorted_genome_bam.bam.bai & filtered_feature_bc_matrix/barcodes.tsv.gz. This is the only required argument for the function. If your directory structure no longer matches the one created by Cell Ranger (e.g. you were given the files from a collaborator or sequencing facility) you can provide the file paths directly using the bam, bam_index and barcodes arguments.
+#' @param bam character
+#' the path to the input bam file. Not required if the 'outs' directory is provided.
+#' @param bam_index character
+#' the path to the input bam file index. Not required if the 'outs' directory is provided.
+#' @param barcodes character
+#' the path to the barcodes.tsv.gz file output by Cell Ranger. Rather than provide the path to a file on disk you can alternatively provide a vector of barcode names. If providing the cell barocodes as a vector, make sure that the format matches the one in the BAM file - be mindful of the "-1" at the end of the barcode sequence. This argument isn't required if the 'outs' directory is provided - the function will just look for "barcodes.tsv.gz" in outs/filtered_feature_bc_matrix/
+#' @param cores numeric
+#' runs the function in parallel using furrr:future_map() with the requested number of cores. Setting `cores=1` will cause future_map to run sequentially.
+#' @param tiles numeric
+#' to speed up the processing of the BAM file we can split the genome up into tiles and process reads in chunks
+#' @param verbose logical
+#' whether or not to print progress
+#'
+#' @return data.frame
+#' the function returns a 1-column data frame containing the calculated nuclear fraction statistic for each input barcode. The order and names of the rows will match those of the input cell barcodes.
+#'
+#' @export
+#'
+#' @examples
+#' #nuclear_fraction(outs = "./outs")
+nuclear_fraction <- function(outs="outs",
                              bam=NULL,
                              bam_index=paste0(bam,".bai"),
                              barcodes=NULL,
-                             cores = availableCores() - 1,
+                             cores = future::availableCores() - 1,
                              tiles = 1000,
                              verbose = TRUE){
 
@@ -53,13 +62,13 @@ nuclear_fraction <- function(outs=NULL,
     # Check barcodes file exists - then read in
     if(!dir.exists(paste0(outs,"/filtered_feature_bc_matrix"))) { stop(paste0("Cellranger outs directory provided, but the required internal directory: '", paste0(outs,"/filtered_feature_bc_matrix"),"', does not appear to exist"), call.=FALSE) }
     if(!file.exists(paste0(outs,"/filtered_feature_bc_matrix/barcodes.tsv.gz"))) { stop(paste0("Cellranger outs directory provided, but the file: '", paste0(outs,"/filtered_feature_bc_matrix/barcodes.tsv.gz"),"', does not appear to exist"), call.=FALSE) }
-    barcodes <- read.table(paste0(outs, "/filtered_feature_bc_matrix/barcodes.tsv.gz"))[,1]
+    barcodes <- utils::read.table(paste0(outs, "/filtered_feature_bc_matrix/barcodes.tsv.gz"))[,1]
 
     # Check and create reference to BAM file
     if(!file.exists(paste0(outs,"/possorted_genome_bam.bam.bai"))) { stop(paste0("Cellranger outs directory provided, but the BAM index: '", paste0(outs,"/possorted_genome_bam.bam.bai"),"', does not appear to exist"), call.=FALSE) }
     bam_check <- check_bam(paste0(outs,"/possorted_genome_bam.bam"))
     if(bam_check[1]=="pass"){
-      bam_file <- BamFile(file = paste0(outs,"/possorted_genome_bam.bam"), index = paste0(outs,"/possorted_genome_bam.bam.bai"))
+      bam_file <- Rsamtools::BamFile(file = paste0(outs,"/possorted_genome_bam.bam"), index = paste0(outs,"/possorted_genome_bam.bam.bai"))
       if(verbose){ message(bam_check[2]) }
     } else {
       if(bam_check[1]=="warning"){ warning(bam_check[2], call.=FALSE) }
@@ -78,7 +87,7 @@ nuclear_fraction <- function(outs=NULL,
     if(!file.exists(bam_index)){ stop(paste0("The supplied bam index: '", bam_index, "' does not appear to exist"), call.=FALSE) }
     bam_check <- check_bam(bam)
     if(bam_check[1]=="pass"){
-      bam_file <- BamFile(file = bam, index = bam_index)
+      bam_file <- Rsamtools::BamFile(file = bam, index = bam_index)
       if(verbose){ message(bam_check[2]) }
     } else {
       if(bam_check[1]=="warning"){ warning(bam_check[2], call.=FALSE) }
@@ -90,7 +99,7 @@ nuclear_fraction <- function(outs=NULL,
     # If barcodes is a path to a file (length==1), read in
     if(length(barcodes)==1){
       if(!file.exists(barcodes)) { stop(paste0("The provided barcodes file: '", barcodes,"', does not appear to exist"),call.=FALSE) }
-      barcodes <- read.table(barcodes)[,1]
+      barcodes <- utils::read.table(barcodes)[,1]
     }
   }
 
@@ -98,29 +107,29 @@ nuclear_fraction <- function(outs=NULL,
   if(verbose){ message(paste0(length(barcodes)," cell barcodes were provided as input. The first five are; ", paste(barcodes[1:5], collapse = ", "))) }
 
   # Create tiles across the genome for processing the BAM file in chunks
-  bam_info <- idxstatsBam(bam_file)
+  bam_info <- Rsamtools::idxstatsBam(bam_file)
   bam_info <- bam_info[bam_info$mapped>0,] # remove seqs with no reads mapped to them
   genome_tiles <- bam_info$seqlength
   names(genome_tiles) <- bam_info$seqnames
-  genome_tiles <- unlist(tileGenome(genome_tiles, ntile = tiles))
+  genome_tiles <- unlist(GenomicRanges::tileGenome(genome_tiles, ntile = tiles))
 
   # Print progress
   if(verbose){ message(paste0("Processing BAM file containing ",round(sum(bam_info$mapped)/1E6,2), " million reads, using ", cores, " cores:")) }
 
   # Process the BAM file with future_map
   if(cores>1){
-    plan(multisession, workers = cores)
+    future::plan(future::multisession, workers = cores)
   } else {
-    plan(sequential)
+    future::plan(future::sequential)
   }
 
   start_time <- Sys.time()
-  tags <- future_map(.x = seq_along(genome_tiles),
+  tags <- furrr::future_map(.x = seq_along(genome_tiles),
                      .f = function(i) parse_bam(interval = genome_tiles[i], bam = bam_file, bc = barcodes),
                      .progress = verbose)
 
   # Close multisession workers
-  plan(sequential)
+  future::plan(future::sequential)
 
   # Print progress
   time_passed <- round(as.numeric(difftime(time1 = Sys.time(), time2 = start_time, units = "mins")), 2)
