@@ -65,13 +65,24 @@
 #'  names of the rows will match those of the input cell barcodes.
 #'
 #'@export
+#'@examples
+#' nf1 <- nuclear_fraction(
+#'     outs = system.file("extdata", "outs", package =
+#'     "dropletQC"),
+#'      tiles = 10, cores = 1, verbose = FALSE)
+#' head(nf1)
 #'
-#' @examples
-#' nf <- nuclear_fraction(outs = system.file("extdata", "outs", package =
-#' "dropletQC"), tiles = 10, cores = 1, verbose = FALSE)
-#' head(nf)
+#' nf2 <- nuclear_fraction(
+#'    bam = system.file("extdata", "outs","possorted_genome_bam.bam", package =
+#'    "dropletQC"),
+#'    barcodes = c("AAAAGTCACTTACTTG-1",
+#'                 "AAAAGTGGATCTCTAA-1",
+#'                 "AAACACGTTCTCATCG-1"),
+#'    tiles = 10, cores = 1,
+#'    verbose = FALSE)
+#' nf2
 #'
-nuclear_fraction <- function(outs="outs",
+nuclear_fraction <- function(outs=NULL,
                              bam=NULL,
                              bam_index=paste0(bam,".bai"),
                              barcodes=NULL,

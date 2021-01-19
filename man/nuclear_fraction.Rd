@@ -5,7 +5,7 @@
 \title{Calculate the nuclear fraction statistic}
 \usage{
 nuclear_fraction(
-  outs = "outs",
+  outs = NULL,
   bam = NULL,
   bam_index = paste0(bam, ".bai"),
   barcodes = NULL,
@@ -87,8 +87,20 @@ supplied barcodes. As a minimum you can provide as input a directory
 containing cellranger the output (outs).
 }
 \examples{
-nf <- nuclear_fraction(outs = system.file("extdata", "outs", package =
-"dropletQC"), tiles = 10, cores = 1, verbose = FALSE)
-head(nf)
+nf1 <- nuclear_fraction(
+    outs = system.file("extdata", "outs", package =
+    "dropletQC"),
+     tiles = 10, cores = 1, verbose = FALSE)
+head(nf1)
+
+nf2 <- nuclear_fraction(
+   bam = system.file("extdata", "outs","possorted_genome_bam.bam", package =
+   "dropletQC"),
+   barcodes = c("AAAAGTCACTTACTTG-1",
+                "AAAAGTGGATCTCTAA-1",
+                "AAACACGTTCTCATCG-1"),
+   tiles = 10, cores = 1,
+   verbose = FALSE)
+nf2
 
 }
