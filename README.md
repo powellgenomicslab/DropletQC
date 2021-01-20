@@ -11,9 +11,8 @@ fraction score, for single cell RNA-seq (scRNA-seq) datasets generated
 using the 10x Genomics Chromium Single Cell Gene Expression platform.
 This statistic is simply:
 
-$$
-nuclear fraction = \\frac{intronic\\ reads}{intronic\\  reads\\  +\\  exonic\\  reads}
-$$
+    nuclear fraction = intronic reads / (intronic  reads  +  exonic  reads)
+
 In words: for each cell barcode provided, the proportion of reads that
 originated from intronic regions is calculated. These RNA fragments
 likely originate from unspliced (nuclear) pre-mRNA, hence the name
