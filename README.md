@@ -42,7 +42,7 @@ You can install dropletQC from [GitHub](https://github.com/) with:
 devtools::install_github("WalterMuskovic/dropletQC")
 ```
 
-## Example
+## Examples
 
 The simplest way to calculate the nuclear fraction score is to simply
 point to the ‘outs’ directory produced by the Cell Ranger software:
@@ -62,7 +62,8 @@ head(nf1)
 #> AAAGCGGATGCATGGT-1       0.03821656
 ```
 
-This assumes the following files are present:
+This assumes the following three files are present in the specified
+directory:
 
 ``` r
 list.files(system.file("extdata", "outs", package = "dropletQC"), recursive = TRUE)
@@ -93,5 +94,14 @@ nf2
 
 Note that here we have provided a vector of requested barcode IDs to the
 `barcodes` argument rather than the path to a file on disk
-`barcodes.tsv.gz`. Either is fine, but make sure the format of your
+`barcodes.tsv.gz`. Either is fine, just make sure the format of your
 barcodes matches the BAM file.
+
+## More information
+
+For more details see our paper published in **Journal Name**: [paper
+title here](https://www.google.com) and the associated GitHub repo:
+[public GitHub repo](https://www.google.com)
+
+For advice about how to interpret the nuclear fraction metric using
+real-world examples, see `vignette("doubletQC")`.
