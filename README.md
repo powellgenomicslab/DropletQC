@@ -99,8 +99,12 @@ barcodes matches the BAM file.
 
 ## More information
 
-For more details see our paper published in **Journal Name**: [paper
-title here](https://www.google.com) and the associated GitHub repo:
+For more details see our paper published in **Journal Name**:
+
+[paper title here](https://www.google.com)
+
+and the associated GitHub repo:
+
 [public GitHub repo](https://www.google.com)
 
 For advice about how to interpret the nuclear fraction metric using
