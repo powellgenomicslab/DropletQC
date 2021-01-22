@@ -107,5 +107,6 @@ and the associated GitHub repo:
 
 [public GitHub repo](https://www.google.com)
 
-For advice about how to interpret the nuclear fraction metric using
-real-world examples, see `vignette("doubletQC")`.
+For more information about how the package works and some tips on how to
+interpret the nuclear fraction metric using real-world examples, see
+`vignette("doubletQC-vignette")`.
