@@ -17,7 +17,7 @@ In words: for each cell barcode provided, the proportion of reads that
 originated from intronic regions is calculated. These RNA fragments
 likely originate from unspliced (nuclear) pre-mRNA, hence the name
 “nuclear fraction”. This metric can be useful to help identify two
-populations that you may want to exclude from your dataset prior to
+populations that you may want flag or exclude from your dataset prior to
 downstream analysis:
 
 1.  “Empty” droplets containing ambient RNA, characterised by a low
@@ -109,4 +109,4 @@ and the associated GitHub repo:
 
 For more information about how the package works and some tips on how to
 interpret the nuclear fraction metric using real-world examples, see
-`vignette("doubletQC-vignette")`.
+`vignette("dropletQC-vignette")`.

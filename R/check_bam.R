@@ -16,7 +16,7 @@
 #'an "error" is returned as the first value. If the file fails the second check
 #'a "warning" is returned as the forst value. Note that the function was written
 #'as a simple helper function to be called internally by
-#'`doubletQC::nuclear_fraction()` and isn't intended for more general use.
+#'`dropletQC::nuclear_fraction()` and isn't intended for more general use.
 #'
 #'@param bam_path character, bam_path should be a character vector pointing to
 #'  the BAM file you want to check.

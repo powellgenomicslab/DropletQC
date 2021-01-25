@@ -34,7 +34,9 @@ Imports:
     future,
     furrr,
     utils,
-    GenomicRanges
+    GenomicRanges,
+    ggplot2,
+    dplyr
 Suggests: 
     knitr,
     rmarkdown

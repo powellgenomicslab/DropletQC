@@ -31,6 +31,6 @@ about any warnings/errors. Note that if the file passes the first file check,
 an "error" is returned as the first value. If the file fails the second check
 a "warning" is returned as the forst value. Note that the function was written
 as a simple helper function to be called internally by
-\code{doubletQC::nuclear_fraction()} and isn't intended for more general use.
+\code{dropletQC::nuclear_fraction()} and isn't intended for more general use.
 }
 \keyword{internal}
