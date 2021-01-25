@@ -1,8 +1,8 @@
 ---
-title: "dropletQC-vignette"
+title: "dropletQC"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{my-vignette}
+  %\VignetteIndexEntry{dropletQC}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
