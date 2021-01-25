@@ -39,7 +39,7 @@ You can install dropletQC from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("WalterMuskovic/dropletQC")
+devtools::install_github("WalterMuskovic/dropletQC", build_vignettes = TRUE)
 ```
 
 ## Examples
@@ -108,5 +108,5 @@ and the associated GitHub repo:
 [public GitHub repo](https://www.google.com)
 
 For more information about how the package works and some tips on how to
-interpret the nuclear fraction metric using real-world examples, see
-`vignette("dropletQC-vignette")`.
+interpret the nuclear fraction score using real-world examples, see
+`vignette("dropletQC")`.
