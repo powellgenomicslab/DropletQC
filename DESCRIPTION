@@ -36,7 +36,12 @@ Imports:
     utils,
     GenomicRanges,
     ggplot2,
-    dplyr
+    dplyr,
+    BiocGenerics,
+    S4Vectors,
+    GenomicAlignments,
+    GenomicFeatures,
+    rtracklayer
 Suggests: 
     knitr,
     rmarkdown

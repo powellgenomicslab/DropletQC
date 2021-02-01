@@ -20,9 +20,9 @@
 #'use.
 #'
 #'@param bam_path character, bam_path should be a character vector pointing to
-#'  the BAM file you want to check.
-#'
-#'@param cb_tag character,
+#'  the BAM file you want to check
+#'@param cb_tag character, the BAM tag containing the cell barcode sequence
+#'@param rt_tag character, the BAM tag containing the region type
 #'
 #'@return character. The function returns a character vector with two elements.
 #'  The first element may take one of three possible values; "error", "warning",

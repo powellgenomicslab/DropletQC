@@ -8,9 +8,11 @@ check_bam(bam_path, cb_tag, rt_tag)
 }
 \arguments{
 \item{bam_path}{character, bam_path should be a character vector pointing to
-the BAM file you want to check.}
+the BAM file you want to check}
 
-\item{cb_tag}{character,}
+\item{cb_tag}{character, the BAM tag containing the cell barcode sequence}
+
+\item{rt_tag}{character, the BAM tag containing the region type}
 }
 \value{
 character. The function returns a character vector with two elements.

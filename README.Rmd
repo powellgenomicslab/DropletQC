@@ -18,11 +18,11 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-This is a simple R package to calculate a QC metric, the nuclear fraction score, for single cell RNA-seq (scRNA-seq) datasets generated using the 10x Genomics Chromium Single Cell Gene Expression platform. This statistic is simply:
+This is a simple R package to calculate a QC metric, the nuclear fraction score, for single cell RNA-seq (scRNA-seq) datasets. This statistic is simply:
 
     nuclear fraction = intronic reads / (intronic  reads  +  exonic  reads)
 
-In words: for each cell barcode provided, the proportion of reads that originated from intronic regions is calculated. These RNA fragments likely originate from unspliced (nuclear) pre-mRNA, hence the name "nuclear fraction". This metric can be useful to help identify two populations that you may want flag or exclude from your dataset prior to downstream analysis:
+In words: for each cell barcode provided, the proportion of reads that originated from intronic regions is calculated. These RNA fragments originate from unspliced (nuclear) pre-mRNA, hence the name "nuclear fraction". This metric can be used to identify two populations that you may want flag or exclude from your dataset prior to downstream analysis:
 
  1. "Empty" droplets containing ambient RNA, characterised by a low nuclear fraction score
  
@@ -40,6 +40,8 @@ devtools::install_github("WalterMuskovic/dropletQC", build_vignettes = TRUE)
 ```
 
 ## Examples
+
+The R packages contains two (to be continued)
 
 The simplest way to calculate the nuclear fraction score is to simply point to the 'outs' directory produced by the Cell Ranger software:
 

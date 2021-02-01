@@ -26,7 +26,6 @@
 #'  internally by `dropletQC::nuclear_fraction_tags` and isn't intended for more
 #'  general use.
 #'
-#'
 #'@keywords internal
 #'
 parse_bam_tags <- function(interval,
