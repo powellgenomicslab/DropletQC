@@ -23,13 +23,13 @@
 #'  the rows are in the same order as the input character vector of cell
 #'  barcodes. If there are no reads in the interval requested, the function will
 #'  return NULL. This function was written as a helper function to be called
-#'  internally by `dropletQC::nuclear_fraction` and isn't intended for more
+#'  internally by `dropletQC::nuclear_fraction_tags` and isn't intended for more
 #'  general use.
 #'
 #'
 #'@keywords internal
 #'
-parse_bam <- function(interval,
+parse_bam_tags <- function(interval,
                       bam,
                       bc,
                       CB_tag,
@@ -72,7 +72,7 @@ parse_bam <- function(interval,
 }
 
 
-#'Calculate the nuclear fraction statistic
+#'Calculate the nuclear fraction statistic using BAM tags
 #'
 #'@description This function uses the region type tags in a provided BAM file to
 #'  calculate for each input cell barcode the nuclear fraction statistic. This
@@ -145,13 +145,13 @@ parse_bam <- function(interval,
 #'
 #'@export
 #'@examples
-#' nf1 <- nuclear_fraction(
+#' nf1 <- nuclear_fraction_tags(
 #'     outs = system.file("extdata", "outs", package =
 #'     "dropletQC"),
 #'      tiles = 10, cores = 1, verbose = FALSE)
 #' head(nf1)
 #'
-#' nf2 <- nuclear_fraction(
+#' nf2 <- nuclear_fraction_tags(
 #'    bam = system.file("extdata", "outs","possorted_genome_bam.bam", package =
 #'    "dropletQC"),
 #'    barcodes = c("AAAAGTCACTTACTTG-1",
@@ -161,7 +161,7 @@ parse_bam <- function(interval,
 #'    verbose = FALSE)
 #' nf2
 #'
-nuclear_fraction <- function(outs=NULL,
+nuclear_fraction_tags <- function(outs=NULL,
                              bam=NULL,
                              bam_index=paste0(bam,".bai"),
                              barcodes=NULL,
@@ -255,7 +255,7 @@ nuclear_fraction <- function(outs=NULL,
 
   start_time <- Sys.time()
   tags <- furrr::future_map(.x = seq_along(genome_tiles),
-                     .f = function(i) parse_bam(interval = genome_tiles[i],
+                     .f = function(i) parse_bam_tags(interval = genome_tiles[i],
                                                 bam = bam_file,
                                                 bc = barcodes,
                                                 CB_tag = cell_barcode_tag,

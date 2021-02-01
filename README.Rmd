@@ -45,7 +45,7 @@ The simplest way to calculate the nuclear fraction score is to simply point to t
 
 ```{r example1}
 library(dropletQC)
-nf1 <- nuclear_fraction(
+nf1 <- nuclear_fraction_tags(
     outs = system.file("extdata", "outs", package = "dropletQC"),
      tiles = 10, cores = 1, verbose = FALSE)
 head(nf1)
@@ -60,7 +60,7 @@ list.files(system.file("extdata", "outs", package = "dropletQC"), recursive = TR
 Alternatively, if you don't have this directory structure or your files have been renamed e.g. they were given to you by a collaborator, you can specify the paths to the required files directly:
 
 ```{r example2}
-nf2 <- nuclear_fraction(
+nf2 <- nuclear_fraction_tags(
    bam = system.file("extdata", "outs","possorted_genome_bam.bam", package =
    "dropletQC"),
    barcodes = c("AAAAGTCACTTACTTG-1",

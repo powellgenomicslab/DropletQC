@@ -9,7 +9,7 @@ vignette: >
 
 
 ## How dropletQC works
-To calculate the nuclear fraction score for each provided cell barcode, we use the `nuclear_fraction` function. This simply scans the 'CB' and 'RE' tags in the provided indexed Cell Ranger barcoded bam file. To access these tags it uses a strategy similar to this:
+To calculate the nuclear fraction score for each provided cell barcode, we use the `nuclear_fraction_tags` function. This simply scans the 'CB' and 'RE' tags in the provided indexed Cell Ranger barcoded bam file. To access these tags it uses a strategy similar to this:
 ```{r inner-workings, message=FALSE, warning=FALSE}
 library(Rsamtools)
 library(GenomicRanges)
@@ -33,15 +33,15 @@ sapply(1:3, function(x)
            ))[[1]]$tag)
 ```
 
-'CB' is the error-corrected cell barcode sequence and 'RE' is one of three single characters representing the region type of the read; E (exonic), N (intronic) or I (intergenic). The nuclear fraction score that is returned by `nuclear_fraction` is simply E/(E+N) for each provided cell barcode. To speed up the processing of the (usually large) BAM file, dropletQC splits the BAM file into a number of genomic tiles and processes them in parallel by internally calling `furrr::future_map`.
+'CB' is the error-corrected cell barcode sequence and 'RE' is one of three single characters representing the region type of the read; E (exonic), N (intronic) or I (intergenic). The nuclear fraction score that is returned by `nuclear_fraction_tags` is simply E/(E+N) for each provided cell barcode. To speed up the processing of the (usually large) BAM file, dropletQC splits the BAM file into a number of genomic tiles and processes them in parallel by internally calling `furrr::future_map`.
 
 
 ## Calculating the nuclear fraction score
-There are two ways to use `nuclear_fraction`; point it to the Cell Ranger ‘outs’ directory or point it to the individual files. The simplest way is to rely on the consistent structure of the ‘outs’ directory produced by the Cell Ranger software:
+There are two ways to use `nuclear_fraction_tags`; point it to the Cell Ranger ‘outs’ directory or point it to the individual files. The simplest way is to rely on the consistent structure of the ‘outs’ directory produced by the Cell Ranger software:
 ```{r example1, message=FALSE, warning=FALSE}
 library(dropletQC)
 
-nf1 <- nuclear_fraction(
+nf1 <- nuclear_fraction_tags(
    outs = system.file("extdata", "outs", package = "dropletQC"),
    tiles = 10,
    cores = 1,
@@ -56,7 +56,7 @@ list.files(system.file("extdata", "outs", package = "dropletQC"),
 
 If you don’t have this directory structure, or your files have been renamed e.g. they were given to you by a collaborator, you can specify the paths to the required files directly:
 ```{r example2, message=FALSE, warning=FALSE}
-nf2 <- nuclear_fraction(
+nf2 <- nuclear_fraction_tags(
    bam = system.file("extdata", "outs", "possorted_genome_bam.bam", package =
                         "dropletQC"),
    barcodes = c(
@@ -191,7 +191,7 @@ intron_sum = adata.layers['unspliced'].sum(axis=1)
 nuclear_fraction = intron_sum/(exon_sum + intron_sum)
 ```
 
-Counting pipelines like these are much more powerful, as they provide spliced and unspliced counts **per gene** as well as per cell barcode. This additional information allows you to perform further analyses, such as RNA velocity, that can take advantage of this additional information. The trade-off here is time - `dropletQC::nuclear_fraction` ignores UMIs and gene-level information in order to calculate the nuclear fraction score quickly. Here is a comparison of the nuclear fraction scores calculated with `dropletQC::nuclear_fraction` *vs* the output from `velocyto`:
+Counting pipelines like these are much more powerful, as they provide spliced and unspliced counts **per gene** as well as per cell barcode. This additional information allows you to perform further analyses, such as RNA velocity, that can take advantage of this additional information. The trade-off here is time - `dropletQC::nuclear_fraction_tags` ignores UMIs and gene-level information in order to calculate the nuclear fraction score quickly. Here is a comparison of the nuclear fraction scores calculated with `dropletQC::nuclear_fraction` *vs* the output from `velocyto`:
 ```{r velocyto-dropletqc-comparison, message=FALSE, warning=FALSE, fig.width=5, fig.height=5}
 ggplot(data = qc_examples,
        aes(x = nuclear_fraction_droplet_qc, y = nuclear_fraction_velocyto)) +

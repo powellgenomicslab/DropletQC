@@ -49,7 +49,7 @@ point to the ‘outs’ directory produced by the Cell Ranger software:
 
 ``` r
 library(dropletQC)
-nf1 <- nuclear_fraction(
+nf1 <- nuclear_fraction_tags(
     outs = system.file("extdata", "outs", package = "dropletQC"),
      tiles = 10, cores = 1, verbose = FALSE)
 head(nf1)
@@ -77,7 +77,7 @@ have been renamed e.g. they were given to you by a collaborator, you can
 specify the paths to the required files directly:
 
 ``` r
-nf2 <- nuclear_fraction(
+nf2 <- nuclear_fraction_tags(
    bam = system.file("extdata", "outs","possorted_genome_bam.bam", package =
    "dropletQC"),
    barcodes = c("AAAAGTCACTTACTTG-1",
