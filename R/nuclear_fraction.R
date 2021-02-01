@@ -1,14 +1,14 @@
 #'Calculate the nuclear fraction statistic
 #'
-#'@description This function uses the RE tags in the Cell Ranger Barcoded BAM
-#'file to calculate for each input cell barcode nuclear the fraction statistic.
-#'This is just the fraction of reads that are intronic:
+#'@description This function uses the region type tags in a provided BAM file to
+#'  calculate for each input cell barcode the nuclear fraction statistic. This
+#'  is just the fraction of reads that are intronic:
 #'
-#'nuclear fraction = # intronic reads / (# intronic reads + # of exonic reads)
+#'  nuclear fraction = # intronic reads / (# intronic reads + # of exonic reads)
 #'
-#'The row names of the returned data frame will match the order and name of the
-#'supplied barcodes. As a minimum you can provide as input a directory
-#'containing cellranger the output (outs).
+#'  The row names of the returned data frame will match the order and name of
+#'  the supplied barcodes. As a minimum you can provide as input a directory
+#'  containing cellranger output (outs).
 #'
 #'@param outs character, the path to the 'outs' directory created by Cell
 #'  Ranger. We assume outs is structured this way:
@@ -37,27 +37,32 @@
 #'  don't need to worry about those, as the only three files that the function
 #'  will require are; possorted_genome_bam.bam, possorted_genome_bam.bam.bai and
 #'  filtered_feature_bc_matrix/barcodes.tsv.gz. This is the only required
-#'  argument for the function. If your directory structure no longer matches the
-#'  one created by Cell Ranger (e.g. you were given the files from a
-#'  collaborator or sequencing facility) you can provide the file paths directly
-#'  using the bam, bam_index and barcodes arguments.
+#'  argument for the function. If your directory structure doesn't match the one
+#'  created by Cell Ranger you can provide the file paths directly using the
+#'  bam, bam_index and barcodes arguments.
 #'
-#'@param bam character, the path to the input bam file. Not required if the
+#'@param bam character, the path to the input bam file. Not required if an
 #'  'outs' directory is provided.
 #'@param bam_index character, the path to the input bam file index. Not required
-#'  if the 'outs' directory is provided.
-#'@param barcodes character, the path to the barcodes.tsv.gz file output by Cell
-#'  Ranger. Rather than provide the path to a file on disk you can alternatively
-#'  provide a vector of barcode names. If providing the cell barocodes as a
-#'  vector, make sure that the format matches the one in the BAM file - be
-#'  mindful of the "-1" at the end of the barcode sequence. This argument isn't
-#'  required if the 'outs' directory is provided - the function will just look
-#'  for "barcodes.tsv.gz" in outs/filtered_feature_bc_matrix
+#'  if an 'outs' directory is provided.
+#'@param barcodes character, either a vector of barcode names or the path to the
+#'  barcodes.tsv.gz file output by Cell Ranger. If providing the cell barcodes
+#'  as a vector, make sure that the format matches the one in the BAM file -
+#'  e.g. be mindful if there are integers appended to the end of the barcode
+#'  sequence. This argument isn't required if an 'outs' directory is provided -
+#'  the function will just look for "barcodes.tsv.gz" in
+#'  outs/filtered_feature_bc_matrix.
 #'@param cores numeric, runs the function in parallel using furrr:future_map()
 #'  with the requested number of cores. Setting `cores=1` will cause future_map
 #'  to run sequentially.
 #'@param tiles numeric, to speed up the processing of the BAM file we can split
 #'  the genome up into tiles and process reads in chunks
+#'@param cell_barcode_tag character, the BAM tag containing the cell barcode
+#'  sequence
+#'@param region_type_tag character, the BAM tag containing the region type
+#'@param exon_tag character, the character string that defines a read as exonic
+#'@param intron_tag character, the character string that defines a read as
+#'  intronic
 #'@param verbose logical, whether or not to print progress
 #'
 #'@return data.frame, the function returns a 1-column data frame containing the
@@ -88,6 +93,10 @@ nuclear_fraction <- function(outs=NULL,
                              barcodes=NULL,
                              cores = future::availableCores() - 1,
                              tiles = 100,
+                             cell_barcode_tag = "CB",
+                             region_type_tag = "RE",
+                             exon_tag = "E",
+                             intron_tag = "N",
                              verbose = TRUE){
 
   # Check `cores`, `tiles` and `verbose` arguments are valid
@@ -109,7 +118,9 @@ nuclear_fraction <- function(outs=NULL,
 
     # Check and create reference to BAM file
     if(!file.exists(paste0(outs,"/possorted_genome_bam.bam.bai"))) { stop(paste0("Cellranger outs directory provided, but the BAM index: '", paste0(outs,"/possorted_genome_bam.bam.bai"),"', does not appear to exist"), call.=FALSE) }
-    bam_check <- check_bam(paste0(outs,"/possorted_genome_bam.bam"))
+    bam_check <- check_bam(paste0(outs,"/possorted_genome_bam.bam"),
+                           cb_tag=cell_barcode_tag,
+                           rt_tag=region_type_tag)
     if(bam_check[1]=="pass"){
       bam_file <- Rsamtools::BamFile(file = paste0(outs,"/possorted_genome_bam.bam"), index = paste0(outs,"/possorted_genome_bam.bam.bai"))
       if(verbose){ message(bam_check[2]) }
@@ -128,7 +139,9 @@ nuclear_fraction <- function(outs=NULL,
 
     # Check BAM
     if(!file.exists(bam_index)){ stop(paste0("The supplied bam index: '", bam_index, "' does not appear to exist"), call.=FALSE) }
-    bam_check <- check_bam(bam)
+    bam_check <- check_bam(bam,
+                           cb_tag=cell_barcode_tag,
+                           rt_tag=region_type_tag)
     if(bam_check[1]=="pass"){
       bam_file <- Rsamtools::BamFile(file = bam, index = bam_index)
       if(verbose){ message(bam_check[2]) }
@@ -168,7 +181,13 @@ nuclear_fraction <- function(outs=NULL,
 
   start_time <- Sys.time()
   tags <- furrr::future_map(.x = seq_along(genome_tiles),
-                     .f = function(i) parse_bam(interval = genome_tiles[i], bam = bam_file, bc = barcodes),
+                     .f = function(i) parse_bam(interval = genome_tiles[i],
+                                                bam = bam_file,
+                                                bc = barcodes,
+                                                CB_tag = cell_barcode_tag,
+                                                RE_tag = region_type_tag,
+                                                EXON_tag = exon_tag,
+                                                INTRON_tag = intron_tag),
                      .progress = verbose)
 
   # Close multisession workers
@@ -182,13 +201,12 @@ nuclear_fraction <- function(outs=NULL,
   tags <- tags[!sapply(tags, is.null)]
 
   # Combine results
-  E = as.integer(unlist((Reduce(`+`, lapply(tags, `[`, 'E')))))
-  I = as.integer(unlist(Reduce(`+`, lapply(tags, `[`, 'I'))))
-  N = as.integer(unlist(Reduce(`+`, lapply(tags, `[`, 'N'))))
-  results <- data.frame(CB = barcodes, E=E, I=I, N=N)
+  exon = as.integer(unlist((Reduce(`+`, lapply(tags, `[`, 'exon')))))
+  intron = as.integer(unlist(Reduce(`+`, lapply(tags, `[`, 'intron'))))
+  results <- data.frame(CB = barcodes, exon=exon, intron=intron)
 
   # Calculate the nuclear fraction (intronic reads / sum of intronic and exonic reads)
-  nuclear_fraction <- results$N/(results$N + results$E)
+  nuclear_fraction <- results$intron/(results$intron + results$exon)
 
   # In some rare cases nuclear_fraction my be NaN (0/0+0). For simplicity, change these to zero.
   nuclear_fraction[is.na(nuclear_fraction)] <- 0

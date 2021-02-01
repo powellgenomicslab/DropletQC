@@ -11,6 +11,10 @@ nuclear_fraction(
   barcodes = NULL,
   cores = future::availableCores() - 1,
   tiles = 100,
+  cell_barcode_tag = "CB",
+  region_type_tag = "RE",
+  exon_tag = "E",
+  intron_tag = "N",
   verbose = TRUE
 )
 }
@@ -42,24 +46,23 @@ Note that there will probably be other files in the directory as well. We
 don't need to worry about those, as the only three files that the function
 will require are; possorted_genome_bam.bam, possorted_genome_bam.bam.bai and
 filtered_feature_bc_matrix/barcodes.tsv.gz. This is the only required
-argument for the function. If your directory structure no longer matches the
-one created by Cell Ranger (e.g. you were given the files from a
-collaborator or sequencing facility) you can provide the file paths directly
-using the bam, bam_index and barcodes arguments.}
+argument for the function. If your directory structure doesn't match the one
+created by Cell Ranger you can provide the file paths directly using the
+bam, bam_index and barcodes arguments.}
 
-\item{bam}{character, the path to the input bam file. Not required if the
+\item{bam}{character, the path to the input bam file. Not required if an
 'outs' directory is provided.}
 
 \item{bam_index}{character, the path to the input bam file index. Not required
-if the 'outs' directory is provided.}
+if an 'outs' directory is provided.}
 
-\item{barcodes}{character, the path to the barcodes.tsv.gz file output by Cell
-Ranger. Rather than provide the path to a file on disk you can alternatively
-provide a vector of barcode names. If providing the cell barocodes as a
-vector, make sure that the format matches the one in the BAM file - be
-mindful of the "-1" at the end of the barcode sequence. This argument isn't
-required if the 'outs' directory is provided - the function will just look
-for "barcodes.tsv.gz" in outs/filtered_feature_bc_matrix}
+\item{barcodes}{character, either a vector of barcode names or the path to the
+barcodes.tsv.gz file output by Cell Ranger. If providing the cell barcodes
+as a vector, make sure that the format matches the one in the BAM file -
+e.g. be mindful if there are integers appended to the end of the barcode
+sequence. This argument isn't required if an 'outs' directory is provided -
+the function will just look for "barcodes.tsv.gz" in
+outs/filtered_feature_bc_matrix.}
 
 \item{cores}{numeric, runs the function in parallel using furrr:future_map()
 with the requested number of cores. Setting \code{cores=1} will cause future_map
@@ -67,6 +70,16 @@ to run sequentially.}
 
 \item{tiles}{numeric, to speed up the processing of the BAM file we can split
 the genome up into tiles and process reads in chunks}
+
+\item{cell_barcode_tag}{character, the BAM tag containing the cell barcode
+sequence}
+
+\item{region_type_tag}{character, the BAM tag containing the region type}
+
+\item{exon_tag}{character, the character string that defines a read as exonic}
+
+\item{intron_tag}{character, the character string that defines a read as
+intronic}
 
 \item{verbose}{logical, whether or not to print progress}
 }
@@ -76,15 +89,15 @@ calculated nuclear fraction statistic for each input barcode. The order and
 names of the rows will match those of the input cell barcodes.
 }
 \description{
-This function uses the RE tags in the Cell Ranger Barcoded BAM
-file to calculate for each input cell barcode nuclear the fraction statistic.
-This is just the fraction of reads that are intronic:
+This function uses the region type tags in a provided BAM file to
+calculate for each input cell barcode the nuclear fraction statistic. This
+is just the fraction of reads that are intronic:
 
 nuclear fraction = # intronic reads / (# intronic reads + # of exonic reads)
 
-The row names of the returned data frame will match the order and name of the
-supplied barcodes. As a minimum you can provide as input a directory
-containing cellranger the output (outs).
+The row names of the returned data frame will match the order and name of
+the supplied barcodes. As a minimum you can provide as input a directory
+containing cellranger output (outs).
 }
 \examples{
 nf1 <- nuclear_fraction(

@@ -2,13 +2,15 @@
 % Please edit documentation in R/check_bam.R
 \name{check_bam}
 \alias{check_bam}
-\title{Check file is a valid Cell Ranger Barcoded BAM file}
+\title{Check BAM file is valid}
 \usage{
-check_bam(bam_path)
+check_bam(bam_path, cb_tag, rt_tag)
 }
 \arguments{
 \item{bam_path}{character, bam_path should be a character vector pointing to
 the BAM file you want to check.}
+
+\item{cb_tag}{character,}
 }
 \value{
 character. The function returns a character vector with two elements.
@@ -19,18 +21,18 @@ any warnings/errors.
 \description{
 Accepts the path to a BAM file. The function executes two checks on the file.
 The first check passes the file through \code{gunzip} and tests whether the bytes
-at the beginning of the BAM file are correct. This ide was taken from a
+at the beginning of the BAM file are correct. This idea was taken from a
 helpful suggestion by Konrad Rudolph in a StackExchange response to "Is there
 an efficient way to check an input BAM in R?". The second check reads in the
-forst 10,000 reads from the BAM file and looks to see if the two required
-tags; CB (cell barcode) and RE (region type : E = exonic, N = intronic, I =
-intergenic) are present. The function returns a character vector with two
-elements. The first element may take one of three possible values; "error",
-"warning", "pass". The second element is a message with provides extra details
-about any warnings/errors. Note that if the file passes the first file check,
-an "error" is returned as the first value. If the file fails the second check
-a "warning" is returned as the forst value. Note that the function was written
-as a simple helper function to be called internally by
-\code{dropletQC::nuclear_fraction()} and isn't intended for more general use.
+first 10,000 reads from the BAM file and looks to see if the two required
+tags; cell barcode and region type are present. The function returns a
+character vector with two elements. The first element may take one of three
+possible values; "error", "warning", "pass". The second element is a message
+with provides extra details about any warnings/errors. Note that if the file
+fails the first file check, an "error" is returned as the first value. If the
+file fails the second check a "warning" is returned as the first value. Note
+that the function was written as a simple helper function to be called
+internally by \code{dropletQC::nuclear_fraction()} and isn't intended for more
+general use.
 }
 \keyword{internal}
