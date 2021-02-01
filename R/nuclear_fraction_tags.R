@@ -59,8 +59,8 @@ parse_bam_tags <- function(interval,
 
   # Create a data frame with two columns; exon and intron, with the same row
   # order as bc
-  exon = data.frame(CB = tags$CB[tags[[RE_tag]]==EXON_tag], exon = tags$Freq[tags[[RE_tag]]==EXON_tag])
-  intron = data.frame(CB = tags$CB[tags[[RE_tag]]==INTRON_tag], intron = tags$Freq[tags[[RE_tag]]==INTRON_tag])
+  exon = data.frame(CB = tags[[CB_tag]][tags[[RE_tag]]==EXON_tag], exon = tags$Freq[tags[[RE_tag]]==EXON_tag])
+  intron = data.frame(CB = tags[[CB_tag]][tags[[RE_tag]]==INTRON_tag], intron = tags$Freq[tags[[RE_tag]]==INTRON_tag])
   tags <- Reduce(function(x, y) merge(x, y, by="CB", all=TRUE),
                  list(data.frame(CB=bc), exon, intron))
 
