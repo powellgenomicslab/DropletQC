@@ -5,12 +5,12 @@
 #'  the unique values in the seqid column of the annotation and all of the
 #'  seqname values from the BAM index. It then checks to see if all of the
 #'  sequence names in the BAM file can be found in the annotation. It returns a
-#'  character vector with two elements. The first element contains either "pass"
-#'  or "warning" ; depending whether all of the sequences were found or not. The
-#'  second element contains a message with more details. Note that the function
-#'  was written as a simple helper function to be called
-#'  `dropletQC::nuclear_fraction_annotation()` and isn't intended for more
-#'  general use.
+#'  character vector with two elements. The first element contains either
+#'  "pass", "warning" or error ; depending on whether all, some or nonw of the
+#'  sequences were found. The second element contains a message with more
+#'  details. Note that the function was written as a simple helper function to
+#'  be called `dropletQC::nuclear_fraction_annotation()` and isn't intended for
+#'  more general use.
 #'
 #'@param bam_file character, should be a character vector pointing to the BAM
 #'  file to be checked.
@@ -18,13 +18,21 @@
 #'  to the annotation file to be checked.
 #'
 #'@return character. The function returns a character vector with two elements.
-#'  The first element may take one of two possible values; "pass" or "warning".
-#'  The second element is a message with provides extra details e.g. if some of
-#'  the sequences in the BAM file are missing from the annotation, a message is
-#'  provided that contains a sample of those sequences.
+#'  The first element may take one of three possible values; "pass", "warning"
+#'  or "error". The second element is a message with provides extra details e.g.
+#'  if some of the sequences in the BAM file are missing from the annotation, a
+#'  message is provided that contains a sample of those sequences.
 #'
 #'@keywords internal
 check_bam_anno <- function(bam_file, annotation){
+
+  # Check annotation exists
+  if (!file.exists(annotation)) {
+    return(c(
+      "error",
+      paste0("The provided annotation: ", annotation, " cannot be found.")
+    ))
+  }
 
   # Get sequence IDs from the annotation file
   anno_seqids <- rtracklayer::readGFF(filepath = annotation,
@@ -38,6 +46,12 @@ check_bam_anno <- function(bam_file, annotation){
 
   # Check if any seqids from the bam file are not in the annotation
   missing_from_anno <- bam_seqids[!bam_seqids%in%anno_seqids]
+
+  if(!any(bam_seqids%in%anno_seqids)){
+    return(c("error",paste0("None of the seqids in the BAM file can be found in the provided annotation.")))
+  }
+
+  # Collapse vector of seqids for printing output
   if (length(missing_from_anno) < 12) {
     missing_from_anno <- paste(missing_from_anno, collapse = ", ")
   } else{
@@ -255,10 +269,19 @@ nuclear_fraction_annotation <- function(
   tiles=1000,
   verbose=TRUE){
 
+  ## Check "simple" arguments are valid
+  if(!all(is.character(annotation_path), length(annotation_path)==1)) { stop("`annotation_path` argument should be a single character string specifying the path to the annotation file", call.=FALSE) }
+  if(!(annotation_format%in%c("auto","gff3","gtf"))) { stop("`annotation_format` should be one of 'auto', 'gff3' or 'gtf'", call.=FALSE) }
+  if(!all(is.character(cell_barcode_tag), length(cell_barcode_tag)==1)) { stop("`cell_barcode_tag` argument should be a single character string specifying the BAM file tag which contains the cellular barcode sequence", call.=FALSE) }
+  if(!all(is.numeric(cores), cores>0)) { stop("`cores` argument should be a positive numeric scalar specifying the maximum number of parallel futures used for parsing the BAM file (passed to furrr:future_map())", call.=FALSE) }
+  if(!all(is.numeric(tiles), tiles>0)) { stop("`tiles` argument should be a positive numeric scalar specifying the number of merged gene intervals to use for parsing the BAM file", call.=FALSE) }
+  if(!is.logical(verbose)) { stop("`verbose` argument should be either TRUE or FALSE, to determine whether or not to print progress messages", call.=FALSE) }
+
+
   ## Get barcodes
   if (!is.character(barcodes)) {
     stop(
-      "`barcodes` should be either a path to file e.g. barcodes.tsv.gz with cell barcodes in the first column, or a character vector of cell barcodes",
+      "`barcodes` should be either a path to file e.g. barcodes.tsv.gz with cell barcodes in the first column (no header - gets passed to `utils::read.table(barcodes)[, 1]`), or a character vector defining cell barcodes",
       call. = FALSE
     )
   }
@@ -278,6 +301,16 @@ nuclear_fraction_annotation <- function(
     barcodes <- utils::read.table(barcodes)[, 1]
   }
 
+  ## Check BAM
+  if(!file.exists(bam_index)){ stop(paste0("The supplied bam index: '", bam_index, "' does not appear to exist"), call.=FALSE) }
+  bam_check <- check_bam(bam, cb_tag=cell_barcode_tag)
+  if(bam_check[1]=="pass"){
+    if(verbose){ message(bam_check[2]) }
+  } else {
+    if(bam_check[1]=="warning"){ warning(bam_check[2], call.=FALSE) }
+    if(bam_check[1]=="error"){ stop(bam_check[2], call.=FALSE) }
+  }
+
   ## Check the annotation is compatible with the BAM file
   anno_check <- check_bam_anno(bam_file = bam,
                                annotation = annotation_path)
@@ -285,8 +318,8 @@ nuclear_fraction_annotation <- function(
     if(verbose){ message(anno_check[2]) }
   } else {
     if(anno_check[1]=="warning"){ warning(anno_check[2], call.=FALSE) }
+    if(anno_check[1]=="error"){ stop(anno_check[2], call.=FALSE) }
   }
-
 
   ## Get transcript, exon and intron ranges
   tx_ranges <- get_transcript_ranges(input_annotation = annotation_path,

@@ -31,7 +31,7 @@
 #'
 #'@keywords internal
 #'
-check_bam <- function(bam_path, cb_tag, rt_tag){
+check_bam <- function(bam_path, cb_tag, rt_tag=NULL){
 
   # Check the file exists
   if(!file.exists(bam_path)){ return(c("error", paste0("The BAM file '", bam_path, "', cannot be found")))}
@@ -40,18 +40,30 @@ check_bam <- function(bam_path, cb_tag, rt_tag){
   bgzf_stream = gzfile(bam_path, 'r')
   bam_peek = suppressWarnings(readChar(bgzf_stream, 4))
   close(bgzf_stream)
-  if(!identical(bam_peek, 'BAM\1')){ return(c("error", paste0("The file provided: ,", bam_path,", may not be a valid BAM file. Failed BAM check.")))}
+  if(!identical(bam_peek, 'BAM\1')){ return(c("error", paste0("The file provided: ,", bam_path,", is not a valid BAM file. Failed BAM check.")))}
 
-  # Scan the first 10,000 reads to see if the BAM file contains the required CB and RE tags
+  # Scan the first 10,000 reads to see if the BAM file contains the required
+  # cell barcode and, if requested, region type tags
   bamFile <- Rsamtools::BamFile(bam_path)
   Rsamtools::yieldSize(bamFile) <- 10000
   open(bamFile)
-  tags <- Rsamtools::scanBam(bamFile, param = Rsamtools::ScanBamParam(tag=c(cb_tag, rt_tag)))[[1]]$tag
+  if (!is.null(rt_tag)) {
+    tags <-
+      Rsamtools::scanBam(bamFile, param = Rsamtools::ScanBamParam(tag = c(cb_tag, rt_tag)))[[1]]$tag
+  } else {
+    tags <-
+      Rsamtools::scanBam(bamFile, param = Rsamtools::ScanBamParam(tag = c(cb_tag)))[[1]]$tag
+  }
   close(bamFile)
   Rsamtools::yieldSize(bamFile) <- NA
-  if(all(is.null(tags[[cb_tag]]), is.null(tags[[rt_tag]]))){ return(c("warning", paste0("Scanned the first 10,000 reads in the supplied BAM file: ", bam_path,". Could not find either of the required '",cb_tag,"' or '",rt_tag,"' tags. Is this a valid Cell Ranger BAM file?"))) }
-  if(is.null(tags[[cb_tag]])){ return(c("warning", paste0("Scanned the first 10,000 reads in the supplied BAM file: ,", bam_path,". Could not find the required '",cb_tag,"' tag. Is this a valid Cell Ranger BAM file?"))) }
-  if(is.null(tags[[rt_tag]])){ return(c("warning", paste0("Scanned the first 10,000 reads in the supplied BAM file: ,", bam_path,". Could not find the required '",rt_tag,"' tag. Is this a valid Cell Ranger BAM file?"))) }
+
+  if (!is.null(rt_tag)) {
+    if(all(is.null(tags[[cb_tag]]), is.null(tags[[rt_tag]]))){ return(c("warning", paste0("Scanned the first 10,000 reads in the supplied BAM file: ", bam_path,". Could not find either of the required '",cb_tag,"' or '",rt_tag,"' tags. Is this a valid Cell Ranger BAM file?"))) }
+    if(is.null(tags[[cb_tag]])){ return(c("warning", paste0("Scanned the first 10,000 reads in the supplied BAM file: ,", bam_path,". Could not find the required '",cb_tag,"' tag. Is this a valid Cell Ranger BAM file?"))) }
+    if(is.null(tags[[rt_tag]])){ return(c("warning", paste0("Scanned the first 10,000 reads in the supplied BAM file: ,", bam_path,". Could not find the required '",rt_tag,"' tag. Is this a valid Cell Ranger BAM file?"))) }
+  } else {
+    if(is.null(tags[[cb_tag]])){ return(c("warning", paste0("Scanned the first 10,000 reads in the supplied BAM file: ,", bam_path,". Could not find the required '",cb_tag,"' tag. Is this a valid Cell Ranger BAM file?"))) }
+  }
 
   # Passed all checks
   return(c("pass",paste0("The provided BAM file: '",bam_path, "' passed all of the BAM QC checks")))

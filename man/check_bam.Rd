@@ -4,7 +4,7 @@
 \alias{check_bam}
 \title{Check BAM file is valid}
 \usage{
-check_bam(bam_path, cb_tag, rt_tag)
+check_bam(bam_path, cb_tag, rt_tag = NULL)
 }
 \arguments{
 \item{bam_path}{character, bam_path should be a character vector pointing to
