@@ -58,7 +58,7 @@ check_bam_anno <- function(bam_file, annotation){
 
 #' Get transcript ranges
 #'
-#' @description This function accepts an annotation as input and returns a list
+#' @description This function accepts an annotation as input and returns a GrangesList
 #'   containing; GRanges defining merged exons and introns. Note that the
 #'   function was written as a simple helper function to be called
 #'   `dropletQC::nuclear_fraction_annotation()` and isn't intended for more
@@ -68,13 +68,12 @@ check_bam_anno <- function(bam_file, annotation){
 #'   the annotation file
 #' @param input_annotation_format character. Can be one of "auto", "gff3" or
 #'   "gtf". This is passed to the 'format' argument of
-#'   GenomicFeatures::makeTxDbFromGFF(). THis should generally just be left as
+#'   GenomicFeatures::makeTxDbFromGFF(). This should generally just be left as
 #'   "auto"
 #'
 #' @return GRangesList. Contains GRanges defining merged exons and introns
-#'   grouped by transcript_blocks. Transcript blocks are genomic regions that
-#'   contain any overlapping transcripts. When defining intronic regions, any
-#'   regions that overlap exons are removed.  Strand is ignored whne merging all
+#'   grouped into ~1000 blocks. When defining intronic regions, any
+#'   regions that overlap exons are removed.  Strand is ignored when merging all
 #'   intervals.
 #'
 #' @keywords internal
@@ -89,13 +88,6 @@ get_transcript_ranges <- function(input_annotation, input_annotation_format){
   exons <- GenomicFeatures::exonsBy(txdb, by = "tx", use.names=TRUE)
   introns <- GenomicFeatures::intronsByTranscript(txdb, use.names=TRUE)
 
-  # Get transcript blocks: GRanges that stretch from the most 5' to most 3'
-  # coordinate of overlapping transcripts (ignores strand)
-  tx_blocks <- GenomicRanges::reduce(c(unlist(range(exons)),
-                                       unlist(range(introns))),
-                                     ignore.strand=TRUE)
-
-
   # Merge any overlapping exon or intron ranges - ignore strand
   exons <- GenomicRanges::reduce(unlist(exons), ignore.strand=TRUE)
   introns <- GenomicRanges::reduce(unlist(introns), ignore.strand=TRUE)
@@ -107,13 +99,12 @@ get_transcript_ranges <- function(input_annotation, input_annotation_format){
   names(introns) <- rep("intron", length(introns))
   names(exons) <- rep("exon", length(exons))
   exons_introns <- c(exons, introns)
+  exons_introns <- sort(exons_introns)
 
-  # Group exons and introns into transcript blocks - creates a list
+  # Reduce to ~1000 ranges or less
   exons_introns <- S4Vectors::split(exons_introns,
-                               as.factor(S4Vectors::to(
-                                 GenomicAlignments::findOverlaps(query = exons_introns,
-                                                                 subject = tx_blocks)
-                               )))
+                                    ceiling(seq_along(exons_introns) / round(length(exons_introns) /
+                                                                               1000)))
 
   return(exons_introns)
 }
@@ -121,15 +112,9 @@ get_transcript_ranges <- function(input_annotation, input_annotation_format){
 
 #' Determine read overlap with exon and intron intervals
 #'
-#' @description A function that accepts seven inputs;
+#' @description A function that accepts four inputs;
 #'
-#'   GRanges transcript blocks
-#'
-#'   An integer defining which transcript block to process
-#'
-#'   A GrangesList containing exons in the input transcript block
-#'
-#'   A GrangesList containing introns in the input transcript block
+#'   A GRanges defining exon and intron ranges
 #'
 #'   A reference to a BAM file
 #'
@@ -143,13 +128,12 @@ get_transcript_ranges <- function(input_annotation, input_annotation_format){
 #'   be called `dropletQC::nuclear_fraction_annotation()` and isn't intended for
 #'   more general use.
 #'
-#' @param block GRanges, contains merged exon and intron intervals grouped in
-#'   thr provided transcript_block
+#' @param block GRanges, contains merged exon and intron intervals
 #' @param bam_file_ref character, a reference to the BAM file to import reads
 #'   from
 #' @param cell_barcodes character, a vector of cell barcodes matching the format
 #'   in bam_file_ref
-#' @param cb_tag character, defines the BAM tage which contains the cell barcode
+#' @param cb_tag character, defines the BAM tags which contains the cell barcode
 #'   e.g. "CB"
 #'
 #' @return integer. This function returns a vector of integers twice the length

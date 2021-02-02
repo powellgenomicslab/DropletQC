@@ -7,8 +7,7 @@
 intron_exon_overlap(block, bam_file_ref, cell_barcodes, cb_tag = "CB")
 }
 \arguments{
-\item{block}{GRanges, contains merged exon and intron intervals grouped in
-thr provided transcript_block}
+\item{block}{GRanges, contains merged exon and intron intervals}
 
 \item{bam_file_ref}{character, a reference to the BAM file to import reads
 from}
@@ -16,7 +15,7 @@ from}
 \item{cell_barcodes}{character, a vector of cell barcodes matching the format
 in bam_file_ref}
 
-\item{cb_tag}{character, defines the BAM tage which contains the cell barcode
+\item{cb_tag}{character, defines the BAM tags which contains the cell barcode
 e.g. "CB"}
 }
 \value{
@@ -26,15 +25,9 @@ in the same order as the input barcodes. If a cell barcode was not detected
 in the range, \code{NA_integer_} is returned.
 }
 \description{
-A function that accepts seven inputs;
+A function that accepts four inputs;
 
-GRanges transcript blocks
-
-An integer defining which transcript block to process
-
-A GrangesList containing exons in the input transcript block
-
-A GrangesList containing introns in the input transcript block
+A GRanges defining exon and intron ranges
 
 A reference to a BAM file
 

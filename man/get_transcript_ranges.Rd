@@ -12,18 +12,17 @@ the annotation file}
 
 \item{input_annotation_format}{character. Can be one of "auto", "gff3" or
 "gtf". This is passed to the 'format' argument of
-GenomicFeatures::makeTxDbFromGFF(). THis should generally just be left as
+GenomicFeatures::makeTxDbFromGFF(). This should generally just be left as
 "auto"}
 }
 \value{
 GRangesList. Contains GRanges defining merged exons and introns
-grouped by transcript_blocks. Transcript blocks are genomic regions that
-contain any overlapping transcripts. When defining intronic regions, any
-regions that overlap exons are removed.  Strand is ignored whne merging all
+grouped into ~1000 blocks. When defining intronic regions, any
+regions that overlap exons are removed.  Strand is ignored when merging all
 intervals.
 }
 \description{
-This function accepts an annotation as input and returns a list
+This function accepts an annotation as input and returns a GrangesList
 containing; GRanges defining merged exons and introns. Note that the
 function was written as a simple helper function to be called
 \code{dropletQC::nuclear_fraction_annotation()} and isn't intended for more
