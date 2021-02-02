@@ -143,9 +143,8 @@ get_transcript_ranges <- function(input_annotation, input_annotation_format){
 #'   be called `dropletQC::nuclear_fraction_annotation()` and isn't intended for
 #'   more general use.
 #'
-#' @param exon_intron_blocks GRangesList, contains merged exon and intron
-#'   intervals grouped into transcript_blocks
-#' @param current_block integer, defining which block of ranges to process
+#' @param block GRanges, contains merged exon and intron intervals grouped in
+#'   thr provided transcript_block
 #' @param bam_file_ref character, a reference to the BAM file to import reads
 #'   from
 #' @param cell_barcodes character, a vector of cell barcodes matching the format
@@ -159,13 +158,10 @@ get_transcript_ranges <- function(input_annotation, input_annotation_format){
 #'   in the range, `NA_integer_` is returned.
 #'
 #' @keywords internal
-intron_exon_overlap <- function(exon_intron_blocks,
-                                current_block,
+intron_exon_overlap <- function(block,
                                 bam_file_ref,
                                 cell_barcodes,
                                 cb_tag="CB"){
-  # Get current
-  block <- exon_intron_blocks[[current_block]]
 
   # Import all reads that fall within the genomic interval containing the exon
   # and intron ranges
@@ -336,8 +332,7 @@ nuclear_fraction_annotation <- function(
       .x = seq_along(tx_ranges),
       .f = function(i)
         intron_exon_overlap(
-          exon_intron_blocks = tx_ranges,
-          current_block = i,
+          block = tx_ranges[[i]],
           bam_file_ref = Rsamtools::BamFile(file = bam, index = bam_index),
           cell_barcodes = barcodes,
           cb_tag = cell_barcode_tag
