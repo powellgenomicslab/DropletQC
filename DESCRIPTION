@@ -41,7 +41,8 @@ Imports:
     S4Vectors,
     GenomicAlignments,
     GenomicFeatures,
-    rtracklayer
+    rtracklayer,
+    GenomeInfoDb
 Suggests: 
     knitr,
     rmarkdown

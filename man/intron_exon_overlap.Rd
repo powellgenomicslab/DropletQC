@@ -5,26 +5,18 @@
 \title{Determine read overlap with exon and intron intervals}
 \usage{
 intron_exon_overlap(
-  transcript_block,
+  exon_intron_blocks,
   current_block,
-  exon_ranges,
-  intron_ranges,
   bam_file_ref,
   cell_barcodes,
   cb_tag = "CB"
 )
 }
 \arguments{
-\item{transcript_block}{Granges, transcript_blocks contains GRanges grouping
-overlapping genes}
+\item{exon_intron_blocks}{GRangesList, contains merged exon and intron
+intervals grouped into transcript_blocks}
 
-\item{current_block}{integer, defining which transcript block to process}
-
-\item{exon_ranges}{GRangesList, contains merged exon intervals grouped by
-transcript_blocks}
-
-\item{intron_ranges}{GRangesList, contains merged intron intervals grouped by
-transcript_blocks}
+\item{current_block}{integer, defining which block of ranges to process}
 
 \item{bam_file_ref}{character, a reference to the BAM file to import reads
 from}
@@ -39,7 +31,7 @@ e.g. "CB"}
 integer. This function returns a vector of integers twice the length
 of the input cell barcode vector containing; c(intron counts, exon counts),
 in the same order as the input barcodes. If a cell barcode was not detected
-in the range, NA_integer_ is returned.
+in the range, \code{NA_integer_} is returned.
 }
 \description{
 A function that accepts seven inputs;

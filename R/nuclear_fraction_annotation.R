@@ -58,20 +58,11 @@ check_bam_anno <- function(bam_file, annotation){
 
 #' Get transcript ranges
 #'
-#' @description This function accepts an annotation as input and returns three
-#'   sets of genomic intervals;
-#'
-#'   transcript_blocks - GRanges that groups any overlapping genes into a single
-#'   GRanges
-#'
-#'   exons - GRangesList containing merged exons grouped by transcript_blocks
-#'
-#'   introns - GRangesList containing merged introns grouped by
-#'   transcript_blocks
-#'
-#' Note that the function was written as a simple helper function to be called
-#' `dropletQC::nuclear_fraction_annotation()` and isn't intended for more
-#' general use.
+#' @description This function accepts an annotation as input and returns a list
+#'   containing; GRanges defining merged exons and introns. Note that the
+#'   function was written as a simple helper function to be called
+#'   `dropletQC::nuclear_fraction_annotation()` and isn't intended for more
+#'   general use.
 #'
 #' @param input_annotation character, should be a character vector pointing to
 #'   the annotation file
@@ -80,17 +71,11 @@ check_bam_anno <- function(bam_file, annotation){
 #'   GenomicFeatures::makeTxDbFromGFF(). THis should generally just be left as
 #'   "auto"
 #'
-#' @return list. A list is returned containing three elements;
-#'
-#'   transcript_blocks - GRanges defining intervals that contain any overlapping
-#'   genes
-#'
-#'   exons - GRangesList containing exons grouped by transcript_blocks.
-#'   Overlapping exons are merged into a single GRanges. Strand is ignored.
-#'
-#'   introns - GRangesList containing introns grouped by transcript_blocks.
-#'   Overlapping introns are merged into a single GRanges. All intronic regions
-#'   that overlap exons are removed.  Strand is ignored.
+#' @return GRangesList. Contains GRanges defining merged exons and introns
+#'   grouped by transcript_blocks. Transcript blocks are genomic regions that
+#'   contain any overlapping transcripts. When defining intronic regions, any
+#'   regions that overlap exons are removed.  Strand is ignored whne merging all
+#'   intervals.
 #'
 #' @keywords internal
 get_transcript_ranges <- function(input_annotation, input_annotation_format){
@@ -110,6 +95,7 @@ get_transcript_ranges <- function(input_annotation, input_annotation_format){
                                        unlist(range(introns))),
                                      ignore.strand=TRUE)
 
+
   # Merge any overlapping exon or intron ranges - ignore strand
   exons <- GenomicRanges::reduce(unlist(exons), ignore.strand=TRUE)
   introns <- GenomicRanges::reduce(unlist(introns), ignore.strand=TRUE)
@@ -117,26 +103,19 @@ get_transcript_ranges <- function(input_annotation, input_annotation_format){
   # Remove from introns any regions that overlap exons
   introns <- BiocGenerics::setdiff(introns, exons)
 
-  # Group introns and exons into transcript blocks - creates a GRangesList,
-  # where the names of each element are integers corresponding to the tx_blocks
-  #the introns/exons fall into
+  # Name exons and introns then combine them
+  names(introns) <- rep("intron", length(introns))
+  names(exons) <- rep("exon", length(exons))
+  exons_introns <- c(exons, introns)
 
-  exons <- split(exons,
-                 as.factor(S4Vectors::to(
-                   GenomicAlignments::findOverlaps(query = exons,
-                                                   subject = tx_blocks)
-                 )))
-  introns <- split(introns,
-                   as.factor(S4Vectors::to(
-                     GenomicAlignments::findOverlaps(query = introns,
-                                                     subject = tx_blocks)
-                   )))
+  # Group exons and introns into transcript blocks - creates a list
+  exons_introns <- S4Vectors::split(exons_introns,
+                               as.factor(S4Vectors::to(
+                                 GenomicAlignments::findOverlaps(query = exons_introns,
+                                                                 subject = tx_blocks)
+                               )))
 
-  return(list(
-    transcript_blocks = tx_blocks,
-    exons = exons,
-    introns = introns
-  ))
+  return(exons_introns)
 }
 
 
@@ -144,33 +123,29 @@ get_transcript_ranges <- function(input_annotation, input_annotation_format){
 #'
 #' @description A function that accepts seven inputs;
 #'
-#' GRanges transcript blocks
+#'   GRanges transcript blocks
 #'
-#' An integer defining which transcript block to process
+#'   An integer defining which transcript block to process
 #'
-#' A GrangesList containing exons in the input transcript block
+#'   A GrangesList containing exons in the input transcript block
 #'
-#' A GrangesList containing introns in the input transcript block
+#'   A GrangesList containing introns in the input transcript block
 #'
-#' A reference to a BAM file
+#'   A reference to a BAM file
 #'
-#' A vector of cell barcodes
+#'   A vector of cell barcodes
 #'
-#' A character vector describing the BAM tag which contains the cell barcode
+#'   A character vector describing the BAM tag which contains the cell barcode
 #'
-#' and returns an integer twice the length of the input cell barcode vector
-#' containing; c(intron counts, exon counts), in the same order as the input
-#' barcodes. Note that the function was written as a simple helper function to
-#' be called `dropletQC::nuclear_fraction_annotation()` and isn't intended for
-#' more general use.
+#'   and returns an integer twice the length of the input cell barcode vector
+#'   containing; c(intron counts, exon counts), in the same order as the input
+#'   barcodes. Note that the function was written as a simple helper function to
+#'   be called `dropletQC::nuclear_fraction_annotation()` and isn't intended for
+#'   more general use.
 #'
-#' @param transcript_block Granges, transcript_blocks contains GRanges grouping
-#'   overlapping genes
-#' @param current_block integer, defining which transcript block to process
-#' @param exon_ranges GRangesList, contains merged exon intervals grouped by
-#'   transcript_blocks
-#' @param intron_ranges GRangesList, contains merged intron intervals grouped by
-#'   transcript_blocks
+#' @param exon_intron_blocks GRangesList, contains merged exon and intron
+#'   intervals grouped into transcript_blocks
+#' @param current_block integer, defining which block of ranges to process
 #' @param bam_file_ref character, a reference to the BAM file to import reads
 #'   from
 #' @param cell_barcodes character, a vector of cell barcodes matching the format
@@ -181,68 +156,52 @@ get_transcript_ranges <- function(input_annotation, input_annotation_format){
 #' @return integer. This function returns a vector of integers twice the length
 #'   of the input cell barcode vector containing; c(intron counts, exon counts),
 #'   in the same order as the input barcodes. If a cell barcode was not detected
-#'   in the range, NA_integer_ is returned.
+#'   in the range, `NA_integer_` is returned.
 #'
 #' @keywords internal
-intron_exon_overlap <- function(transcript_block,
+intron_exon_overlap <- function(exon_intron_blocks,
                                 current_block,
-                                exon_ranges,
-                                intron_ranges,
                                 bam_file_ref,
                                 cell_barcodes,
                                 cb_tag="CB"){
+  # Get current
+  block <- exon_intron_blocks[[current_block]]
 
-  # Import all reads that fall within the transcript block as GAlignmentPairs
-  # objects
+  # Import all reads that fall within the genomic interval containing the exon
+  # and intron ranges
   reads <- GenomicAlignments::readGAlignments(
     file = bam_file_ref,
     param = Rsamtools::ScanBamParam(tag = cb_tag,
-                                    which = transcript_block[current_block])
+                                    which = range(block))
   )
 
   # Account for cases where interval contains no reads - return a vector of NA's
   if(length(reads)==0){ return(rep(NA, length(cell_barcodes)*2)) }
 
-  # Find reads that overlap introns within the input transcript block
-
-  if(!(as.character(current_block) %in% names(intron_ranges))){
-    # Account for situation where there are no introns in the transcript block
-    intron_hits <- rep(NA, length(cell_barcodes))
-  } else{
-    intron_hits <-
-      GenomicAlignments::findOverlaps(
-        query = unlist(intron_ranges[as.character(current_block)]),
-        subject = reads,
-        minoverlap = 5
-      )
-
-    # Count cell barcodes from hits - will remove any NAs for us
-    intron_hits <-
-      table(reads@elementMetadata[[cb_tag]][S4Vectors::to(intron_hits)])
-
-    # Change from table to a named vector of integers
-    intron_hits <- rep(intron_hits)
-
-    # Remove any cell barcodes not in our list. Also changes vector to the same
-    # length as our list of barcodes, inserting NA for missing barcodes
-    intron_hits <- intron_hits[cell_barcodes]
-  }
+  # Find reads that overlap exons and introns
+  all_hits <-
+    GenomicAlignments::findOverlaps(
+      query = block,
+      subject = reads,
+      minoverlap = 5
+    )
 
 
-  # Repeat for exons
-  if(!(as.character(current_block) %in% names(exon_ranges))){
-    exon_hits <- rep(NA, length(cell_barcodes))
-  } else{
-    exon_hits <-
-      GenomicAlignments::findOverlaps(
-        query = unlist(exon_ranges[as.character(current_block)]),
-        subject = reads,
-        minoverlap = 5
-      )
-    exon_hits <- table(reads@elementMetadata[[cb_tag]][S4Vectors::to(exon_hits)])
-    exon_hits <- rep(exon_hits)
-    exon_hits <- exon_hits[cell_barcodes]
-  }
+  # Count cell barcodes and exon/intron hits
+  region_hits <-
+    table(cell_barcode=reads@elementMetadata[[cb_tag]][S4Vectors::to(all_hits)],
+  region_type = names(block)[S4Vectors::from(all_hits)])
+  region_hits <- data.frame(region_hits)
+
+  # Get named vectors of integers
+  # exons
+  exon_hits <- region_hits$Freq[region_hits$region_type=="exon"]
+  names(exon_hits) <- region_hits$cell_barcode[region_hits$region_type=="exon"]
+  exon_hits <- exon_hits[cell_barcodes]
+  # introns
+  intron_hits <- region_hits$Freq[region_hits$region_type=="intron"]
+  names(intron_hits) <- region_hits$cell_barcode[region_hits$region_type=="intron"]
+  intron_hits <- intron_hits[cell_barcodes]
 
   return(c(intron_hits, exon_hits))
 }
@@ -271,8 +230,8 @@ intron_exon_overlap <- function(transcript_block,
 #'  barcodes as a vector, make sure that the format matches the one in the BAM
 #'  file - e.g. be mindful if there are integers appended to the end of the
 #'  barcode sequence.
-#'@param cell_barcode_tag character, defines the BAM tage which contains the cell barcode
-#'   e.g. "CB"
+#'@param cell_barcode_tag character, defines the BAM tage which contains the
+#'  cell barcode e.g. "CB"
 #'@param cores numeric, parsing of the BAM file can be run in parallel using
 #'  furrr:future_map() with the requested number of cores. Setting `cores=1`
 #'  will cause future_map to run sequentially.
@@ -346,6 +305,14 @@ nuclear_fraction_annotation <- function(
   tx_ranges <- get_transcript_ranges(input_annotation = annotation_path,
                                      input_annotation_format = annotation_format)
 
+  # Remove ranges from sequences not in the BAM file
+  bam_info <- Rsamtools::idxstatsBam(bam)
+  bam_seqs <- bam_info$seqnames
+  tx_seqs <- GenomicRanges::seqnames(GenomicRanges::seqinfo(tx_ranges))
+  tx_ranges <- GenomeInfoDb::dropSeqlevels(x = tx_ranges,
+                                   value = tx_seqs[!tx_seqs%in%bam_seqs],
+                                   pruning.mode = "tidy")
+
 
   ## Loop through transcript blocks to get intron and exon counts
   # Print progress
@@ -353,7 +320,7 @@ nuclear_fraction_annotation <- function(
     message(
       paste0(
         "Processing BAM file containing ",
-        round(sum(Rsamtools::idxstatsBam(bam)$mapped) / 1E6, 2),
+        round(sum(bam_info$mapped) / 1E6, 2),
         " million reads, using ",
         cores,
         " cores:"
@@ -366,13 +333,11 @@ nuclear_fraction_annotation <- function(
   future::plan(future::multisession, workers = cores)
   ie <-
     furrr::future_map(
-      .x = seq_along(tx_ranges[["transcript_blocks"]]),
+      .x = seq_along(tx_ranges),
       .f = function(i)
         intron_exon_overlap(
-          transcript_block = tx_ranges[["transcript_blocks"]],
+          exon_intron_blocks = tx_ranges,
           current_block = i,
-          exon_ranges = tx_ranges[["exons"]],
-          intron_ranges = tx_ranges[["introns"]],
           bam_file_ref = Rsamtools::BamFile(file = bam, index = bam_index),
           cell_barcodes = barcodes,
           cb_tag = cell_barcode_tag

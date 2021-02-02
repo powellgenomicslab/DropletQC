@@ -34,8 +34,8 @@ barcodes as a vector, make sure that the format matches the one in the BAM
 file - e.g. be mindful if there are integers appended to the end of the
 barcode sequence.}
 
-\item{cell_barcode_tag}{character, defines the BAM tage which contains the cell barcode
-e.g. "CB"}
+\item{cell_barcode_tag}{character, defines the BAM tage which contains the
+cell barcode e.g. "CB"}
 
 \item{cores}{numeric, parsing of the BAM file can be run in parallel using
 furrr:future_map() with the requested number of cores. Setting \code{cores=1}

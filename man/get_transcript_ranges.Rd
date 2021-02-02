@@ -16,31 +16,16 @@ GenomicFeatures::makeTxDbFromGFF(). THis should generally just be left as
 "auto"}
 }
 \value{
-list. A list is returned containing three elements;
-
-transcript_blocks - GRanges defining intervals that contain any overlapping
-genes
-
-exons - GRangesList containing exons grouped by transcript_blocks.
-Overlapping exons are merged into a single GRanges. Strand is ignored.
-
-introns - GRangesList containing introns grouped by transcript_blocks.
-Overlapping introns are merged into a single GRanges. All intronic regions
-that overlap exons are removed.  Strand is ignored.
+GRangesList. Contains GRanges defining merged exons and introns
+grouped by transcript_blocks. Transcript blocks are genomic regions that
+contain any overlapping transcripts. When defining intronic regions, any
+regions that overlap exons are removed.  Strand is ignored whne merging all
+intervals.
 }
 \description{
-This function accepts an annotation as input and returns three
-sets of genomic intervals;
-
-transcript_blocks - GRanges that groups any overlapping genes into a single
-GRanges
-
-exons - GRangesList containing merged exons grouped by transcript_blocks
-
-introns - GRangesList containing merged introns grouped by
-transcript_blocks
-
-Note that the function was written as a simple helper function to be called
+This function accepts an annotation as input and returns a list
+containing; GRanges defining merged exons and introns. Note that the
+function was written as a simple helper function to be called
 \code{dropletQC::nuclear_fraction_annotation()} and isn't intended for more
 general use.
 }
