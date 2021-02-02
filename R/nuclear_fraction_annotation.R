@@ -1,4 +1,4 @@
-#' Check annotation and BAM file are compatible
+#'Check annotation and BAM file are compatible
 #'
 #'@description This function checks whether the annotation file and the BAM file
 #'  provided to `nuclear_fraction_annotation()` are compatible. It pulls all of
@@ -12,18 +12,18 @@
 #'  `dropletQC::nuclear_fraction_annotation()` and isn't intended for more
 #'  general use.
 #'
-#' @param bam_file character, should be a character vector pointing to
-#'   the BAM file to be checked.
-#' @param annotation character, annotation should be a character vector pointing
-#'   to the annotation file to be checked.
+#'@param bam_file character, should be a character vector pointing to the BAM
+#'  file to be checked.
+#'@param annotation character, annotation should be a character vector pointing
+#'  to the annotation file to be checked.
 #'
-#' @return character. The function returns a character vector with two elements.
-#'   The first element may take one of two possible values; "pass" or "warning".
-#'   The second element is a message with provides extra details e.g. if some of
-#'   the sequences in the BAM file are missing from the annotation, a message is
-#'   provided that contains a sample of those sequences.
+#'@return character. The function returns a character vector with two elements.
+#'  The first element may take one of two possible values; "pass" or "warning".
+#'  The second element is a message with provides extra details e.g. if some of
+#'  the sequences in the BAM file are missing from the annotation, a message is
+#'  provided that contains a sample of those sequences.
 #'
-#' @keywords internal
+#'@keywords internal
 check_bam_anno <- function(bam_file, annotation){
 
   # Get sequence IDs from the annotation file
@@ -56,28 +56,32 @@ check_bam_anno <- function(bam_file, annotation){
 }
 
 
-#' Get transcript ranges
+#'Get transcript ranges
 #'
-#' @description This function accepts an annotation as input and returns a GrangesList
-#'   containing; GRanges defining merged exons and introns. Note that the
-#'   function was written as a simple helper function to be called
-#'   `dropletQC::nuclear_fraction_annotation()` and isn't intended for more
-#'   general use.
+#'@description This function accepts an annotation as input and returns a
+#'  GrangesList containing; GRanges defining merged exons and introns. Note that
+#'  the function was written as a simple helper function to be called
+#'  `dropletQC::nuclear_fraction_annotation()` and isn't intended for more
+#'  general use.
 #'
-#' @param input_annotation character, should be a character vector pointing to
-#'   the annotation file
-#' @param input_annotation_format character. Can be one of "auto", "gff3" or
-#'   "gtf". This is passed to the 'format' argument of
-#'   GenomicFeatures::makeTxDbFromGFF(). This should generally just be left as
-#'   "auto"
+#'@param input_annotation character, should be a character vector pointing to
+#'  the annotation file
+#'@param input_annotation_format character. Can be one of "auto", "gff3" or
+#'  "gtf". This is passed to the 'format' argument of
+#'  GenomicFeatures::makeTxDbFromGFF(). This should generally just be left as
+#'  "auto"
+#'@param ntiles integer, the number of blocks that exons and introns should be
+#'  grouped into
 #'
-#' @return GRangesList. Contains GRanges defining merged exons and introns
-#'   grouped into ~1000 blocks. When defining intronic regions, any
-#'   regions that overlap exons are removed.  Strand is ignored when merging all
-#'   intervals.
+#'@return GRangesList. Contains GRanges defining merged exons and introns
+#'  grouped into ~ntiles blocks. When defining intronic regions, any regions
+#'  that overlap exons are removed.  Strand is ignored when merging all
+#'  intervals.
 #'
-#' @keywords internal
-get_transcript_ranges <- function(input_annotation, input_annotation_format){
+#'@keywords internal
+get_transcript_ranges <- function(input_annotation,
+                                  input_annotation_format,
+                                  ntiles){
 
   print("Extracting exon and intron ranges from provided annotation file:")
   print(input_annotation)
@@ -101,10 +105,10 @@ get_transcript_ranges <- function(input_annotation, input_annotation_format){
   exons_introns <- c(exons, introns)
   exons_introns <- sort(exons_introns)
 
-  # Reduce to ~1000 ranges or less
+  # Reduce to ~ntiles ranges or less
   exons_introns <- S4Vectors::split(exons_introns,
                                     ceiling(seq_along(exons_introns) / round(length(exons_introns) /
-                                                                               1000)))
+                                                                               ntiles)))
 
   return(exons_introns)
 }
@@ -215,6 +219,8 @@ intron_exon_overlap <- function(block,
 #'@param cores numeric, parsing of the BAM file can be run in parallel using
 #'  furrr:future_map() with the requested number of cores. Setting `cores=1`
 #'  will cause future_map to run sequentially.
+#' @param tiles integer, to speed up the processing of the BAM file we can split
+#'  transcripts up into tiles and process reads in chunks, default=1000.
 #'@param verbose logical, whether or not to print progress
 #'
 #'@return data.frame. Returns a data frame containing the nuclear fraction
@@ -246,6 +252,7 @@ nuclear_fraction_annotation <- function(
   barcodes,
   cell_barcode_tag ="CB",
   cores=future::availableCores() - 1,
+  tiles=1000,
   verbose=TRUE){
 
   ## Get barcodes
@@ -283,7 +290,8 @@ nuclear_fraction_annotation <- function(
 
   ## Get transcript, exon and intron ranges
   tx_ranges <- get_transcript_ranges(input_annotation = annotation_path,
-                                     input_annotation_format = annotation_format)
+                                     input_annotation_format = annotation_format,
+                                     ntiles=tiles)
 
   # Remove ranges from sequences not in the BAM file
   bam_info <- Rsamtools::idxstatsBam(bam)

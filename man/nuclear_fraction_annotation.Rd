@@ -12,6 +12,7 @@ nuclear_fraction_annotation(
   barcodes,
   cell_barcode_tag = "CB",
   cores = future::availableCores() - 1,
+  tiles = 1000,
   verbose = TRUE
 )
 }
@@ -40,6 +41,9 @@ cell barcode e.g. "CB"}
 \item{cores}{numeric, parsing of the BAM file can be run in parallel using
 furrr:future_map() with the requested number of cores. Setting \code{cores=1}
 will cause future_map to run sequentially.}
+
+\item{tiles}{integer, to speed up the processing of the BAM file we can split
+transcripts up into tiles and process reads in chunks, default=1000.}
 
 \item{verbose}{logical, whether or not to print progress}
 }

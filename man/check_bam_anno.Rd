@@ -7,8 +7,8 @@
 check_bam_anno(bam_file, annotation)
 }
 \arguments{
-\item{bam_file}{character, should be a character vector pointing to
-the BAM file to be checked.}
+\item{bam_file}{character, should be a character vector pointing to the BAM
+file to be checked.}
 
 \item{annotation}{character, annotation should be a character vector pointing
 to the annotation file to be checked.}

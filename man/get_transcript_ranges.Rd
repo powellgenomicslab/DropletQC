@@ -4,7 +4,7 @@
 \alias{get_transcript_ranges}
 \title{Get transcript ranges}
 \usage{
-get_transcript_ranges(input_annotation, input_annotation_format)
+get_transcript_ranges(input_annotation, input_annotation_format, ntiles)
 }
 \arguments{
 \item{input_annotation}{character, should be a character vector pointing to
@@ -14,17 +14,20 @@ the annotation file}
 "gtf". This is passed to the 'format' argument of
 GenomicFeatures::makeTxDbFromGFF(). This should generally just be left as
 "auto"}
+
+\item{ntiles}{integer, the number of blocks that exons and introns should be
+grouped into}
 }
 \value{
 GRangesList. Contains GRanges defining merged exons and introns
-grouped into ~1000 blocks. When defining intronic regions, any
-regions that overlap exons are removed.  Strand is ignored when merging all
+grouped into ~ntiles blocks. When defining intronic regions, any regions
+that overlap exons are removed.  Strand is ignored when merging all
 intervals.
 }
 \description{
-This function accepts an annotation as input and returns a GrangesList
-containing; GRanges defining merged exons and introns. Note that the
-function was written as a simple helper function to be called
+This function accepts an annotation as input and returns a
+GrangesList containing; GRanges defining merged exons and introns. Note that
+the function was written as a simple helper function to be called
 \code{dropletQC::nuclear_fraction_annotation()} and isn't intended for more
 general use.
 }
