@@ -67,6 +67,9 @@ parse_bam_tags <- function(interval,
   # Replace NA's with zero
   tags[is.na(tags)] <- 0
 
+  # Ensure same order as the input barcodes
+  tags <- tags[match(bc, tags$CB),]
+
   return(tags)
 }
 
