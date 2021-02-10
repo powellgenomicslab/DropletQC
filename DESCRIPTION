@@ -44,7 +44,8 @@ Imports:
     rtracklayer,
     GenomeInfoDb,
     ks,
-    ggpubr
+    ggpubr,
+    mclust
 Suggests: 
     knitr,
     rmarkdown

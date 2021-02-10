@@ -47,6 +47,6 @@ gbm <- qc_examples[qc_examples$sample=="GBM",]
 gbm <- data.frame(nf=gbm$nuclear_fraction_droplet_qc, umi=gbm$umi_count)
 gbm.ed <- identify_empty_drops(nf_umi = gbm)
 head(gbm.ed)
-table(gbm.ed[["cell_status"]])
+table(gbm.ed$cell_status)
 
 }
