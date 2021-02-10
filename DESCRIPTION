@@ -42,7 +42,9 @@ Imports:
     GenomicAlignments,
     GenomicFeatures,
     rtracklayer,
-    GenomeInfoDb
+    GenomeInfoDb,
+    ks,
+    ggpubr
 Suggests: 
     knitr,
     rmarkdown
