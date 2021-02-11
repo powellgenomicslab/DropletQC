@@ -4,17 +4,63 @@
 \alias{identify_damaged_cells}
 \title{Identify damaged cells}
 \usage{
-identify_damaged_cells(nf_umi_ed)
+identify_damaged_cells(
+  nf_umi_ed_ct,
+  nf_sep = 0.2,
+  umi_sep_perc = 50,
+  output_plots = FALSE
+)
 }
 \arguments{
-\item{nf_umi_ed}{}
+\item{nf_umi_ed_ct}{data frame, with four columns. The first three columns
+should match the output from the \code{identify_empty_drops} function. The
+fourth column should contain cell type names.}
+
+\item{nf_sep}{numeric, the minimum separation of the nuclear fraction score
+required between the cell and damage cell populations}
+
+\item{umi_sep_perc}{numeric, this is the minimum percentage of UMIs which the
+damaged cell population is required to have compared to the cell
+population. For example, if the mean UMI of the distribution fit to the
+whole cell population is 10,000 UMIs, the mean of the distribution fit to
+the damaged cell population must be at less than 7,000 UMIs if the umi_sep
+parameter is 30 (\%)}
+
+\item{output_plots}{logical, whether or not to return plots}
 }
 \value{
-
+list, of length two. The first element in the list contains a data
+frame with the same dimensions input to the \code{nf_umi_ed_ct} argument, with
+damaged cells now recorded in the third column. The second element is NULL
+unless \code{output_plots}=TRUE. If requested, three plots are returned for each
+cell type in a named list, combined using the patchwork package. For each
+cell type, the first plot illustrates the cell and damaged cell populations
+(if any) in a plot of nuclear fraction vs log10(UMI counts). Damaged cells
+are expected to be in the lower right portion of the plot(lower UMI counts
+and higher nuclear fraction). The second and third plots show the model
+fits to the nuclear fraction and UMI count distributions respectively.
+Solid lines indicate the distribution mean, while dashed lines indicate the
+positions of the thrsholds controlled by the \code{nf_sep} and \code{umi_sep}
+parameters.
 }
 \description{
-Identify damaged cells
+This function uses a combination of the cell UMI counts and the
+nuclear fraction score to assign each cell one of two values; "cell" or
+"damaged_cell". This is based on the idea that damaged cells have a lower
+UMI count and higher nuclear fraction than whole cells. The expected input
+is a data frame with four columns. The first three columns should contain;
+the nuclear fraction score, total UMIs and a character vector describing
+each cell as "cell" or "empty_droplet". This is the format output by the
+\code{identify_empty_drops} function. The fourth column should be a character
+vector with user-assigned cell types. Internally, the provided data frame
+is split by cell type and a Gaussian mixture model with a maximum of two
+components is fit to the umi counts and nuclear fraction scores. The
+parameters of the model are estimated using expectation maximisation (EM)
+with the \code{mclust} package. The best model is selected using the Bayesian
+Information Criterion (BIC). The two populations (cells and damaged cells)
+are assumed to have equal variance (mclust model name "EEI").
 }
 \examples{
 #1
+
 }
