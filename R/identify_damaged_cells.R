@@ -98,7 +98,7 @@ assess_EM <- function(em, umi_thresh, nf_thresh){
 #'   model results
 #' @param input_cell_type character, the name of the cell type
 #'
-#' @return patchwork, three ggplots combined using the patchwork package
+#' @return ggarrange, three ggplots combined using `ggpubr::ggarrange`
 #'
 #' @keywords internal
 plot_EM <- function(em, em_c, input_cell_type, umi_thresh, nf_thresh){
@@ -125,7 +125,7 @@ plot_EM <- function(em, em_c, input_cell_type, umi_thresh, nf_thresh){
     ggplot2::geom_point() +
     ggplot2::xlab("Nuclear fraction") +
     ggplot2::ylab("log10(UMI count)") +
-    ggplot2::scale_colour_discrete(input_cell_type)
+    ggplot2::scale_colour_discrete(stringr::str_wrap(input_cell_type, width = 15))
 
 
   ### nf ###
@@ -186,7 +186,8 @@ plot_EM <- function(em, em_c, input_cell_type, umi_thresh, nf_thresh){
     p3 <- p3 + ggplot2::geom_vline(xintercept = umi_diff, linetype="dashed", colour = cell_colour)
   }
 
-  return(p1 + p2 + p3)
+  p.grid <- ggpubr::ggarrange(ggpubr::ggarrange(p1, p2, p3, ncol = 3))
+  return(p.grid)
 
 }
 
@@ -222,12 +223,14 @@ plot_EM <- function(em, em_c, input_cell_type, umi_thresh, nf_thresh){
 #'   the damaged cell population must be at less than 7,000 UMIs if the umi_sep
 #'   parameter is 30 (%)
 #' @param output_plots logical, whether or not to return plots
+#' @param verbose logical, whether to print updates and progress while fitting
+#'   with EM
 #'
 #' @return list, of length two. The first element in the list contains a data
 #'   frame with the same dimensions input to the `nf_umi_ed_ct` argument, with
-#'   damaged cells now recorded in the third column. The second element is NULL
+#'   "damaged_cell" now recorded in the third column. The second element is NULL
 #'   unless `output_plots`=TRUE. If requested, three plots are returned for each
-#'   cell type in a named list, combined using the patchwork package. For each
+#'   cell type in a named list, combined using `ggpubr::ggarrange`. For each
 #'   cell type, the first plot illustrates the cell and damaged cell populations
 #'   (if any) in a plot of nuclear fraction vs log10(UMI counts). Damaged cells
 #'   are expected to be in the lower right portion of the plot(lower UMI counts
@@ -241,13 +244,79 @@ plot_EM <- function(em, em_c, input_cell_type, umi_thresh, nf_thresh){
 #' @importFrom mclust mclustBIC
 #'
 #' @examples #1
+#' data("qc_examples")
+#' gbm <- qc_examples[qc_examples$sample=="MB",]
+#' gbm.ed <- gbm[,c("nuclear_fraction_droplet_qc","umi_count")]
+#' gbm.ed <- identify_empty_drops(nf_umi = gbm.ed)
+#' gbm.ed$cell_type <- gbm$cell_type
+#' gbm.ed.dc <- identify_damaged_cells(gbm.ed, verbose=FALSE)
+#' gbm.ed.dc <- gbm.ed.dc[[1]]
+#' head(gbm.ed.dc)
+#' table(gbm.ed.dc$cell_status)
 #'
 identify_damaged_cells <- function(nf_umi_ed_ct,
-                                   nf_sep=0.2,
+                                   nf_sep=0.15,
                                    umi_sep_perc=50, # UMI counts percentage less than cell
-                                   output_plots=FALSE){
+                                   output_plots=FALSE,
+                                   verbose=TRUE){
 
-  # Check and parse arguments
+  # Check nf_umi_ed_ct argument
+
+
+
+  if (any(class(nf_umi_ed_ct) == "data.frame")) {
+
+    # Check four columns exist
+    if(ncol(nf_umi_ed_ct)!=4){
+      stop(paste0("nf_umi_ed_ct should be a data frame with four columns, see function arguments"), call.=FALSE)
+    }
+
+    # Assume nuclear fraction is in the first column
+    nf <- unlist(nf_umi_ed_ct[, 1], use.names = FALSE)
+    # Assume UMI counts are in the second column
+    umi <- unlist(nf_umi_ed_ct[, 2], use.names = FALSE)
+    # Assume third column contains "cell" or "empty_droplet"
+    ed <- unlist(nf_umi_ed_ct[, 3], use.names = FALSE)
+    # Assume fourth column contains cell types
+    ct <- unlist(nf_umi_ed_ct[, 4], use.names = FALSE)
+
+
+    # Check values are reasonable
+    if(any(c(max(nf)>1, min(nf)<0))){
+      warning(paste0("The nuclear fraction values provided in the first column of 'nf_umi_ed_ct' should be between 0 and 1, but values outside this range were identified : minimum = ",min(nf),", maximum = ",max(nf)), call.=FALSE)
+    }
+
+    if(!all(umi == floor(umi))){
+      non_integer_examples <- which(umi != floor(umi))
+      if(length(non_integer_examples)>5){
+        non_integer_examples <- non_integer_examples[1:5]
+      }
+      non_integer_examples <- paste(umi[non_integer_examples], collapse = ",")
+      warning(paste0("Non-integer values detected in the second column of 'nf_umi_ed_ct' (e.g. ",non_integer_examples,") where umi counts were expected"), call.=FALSE)
+    }
+
+    if(max(umi)<100){
+      warning(paste0("The total umi counts provided in the second column of 'nf_umi_ed_ct' appear to be quite low (max = ",max(umi),"), are these the total UMI counts per cell?"), call.=FALSE)
+    }
+
+    if(!all(unique(ed)%in%c("cell", "empty_droplet"))){
+      ed_output <- unique(ed)
+      if(length(ed_output)>5){
+        ed_output <- ed_output[1:5]
+        ed_output <- paste(ed_output, collapse = ",")
+      }
+      warning(paste0("The third column of 'nf_umi_ed_ct' was expected to contain either 'cell' or 'empty_droplet' but contains; ",ed_output), call.=FALSE)
+    }
+
+    if(verbose){
+      ct <- unique(ct)
+      ct <- paste(ct, collapse = ",")
+      print(paste0("The following cell types were provided; ", ct))
+    }
+
+  } else {
+    stop(paste0("A data frame should be supplied to the nf_umi_ed_ct argument, but an object of class ",paste(class(nf_umi), collapse = "/")," was provided"), call.=FALSE)
+  }
 
   # Extract data for EM
   em.data <- data.frame(nf = unlist(nf_umi_ed_ct[,1], use.names = FALSE),
@@ -262,7 +331,8 @@ identify_damaged_cells <- function(nf_umi_ed_ct,
   em.data.ct <-split(em.data, em.data$ct)
 
   # Run EM for all cell types
-  em_mods <- lapply(em.data.ct, function(x) mclust::Mclust(data = x[,1:2], G = 1:2, modelNames = "EEI"))
+  if(verbose){ print("Fitting models with EM") }
+  em_mods <- lapply(em.data.ct, function(x) mclust::Mclust(data = x[,1:2], G = 1:2, modelNames = "EEI", verbose = verbose))
 
   # Assign barcodes as "cell" or "damaged_cell" using the `assess_EM` function
   em_mods_assessed  <- lapply(em_mods,
@@ -272,6 +342,7 @@ identify_damaged_cells <- function(nf_umi_ed_ct,
 
   # Create plots if requested
   if(output_plots){
+    if(verbose){ print("Creating requested plots") }
     em_plots <- lapply(seq_along(em_mods), function(x) plot_EM(em = em_mods[[x]],
                                                              em_c = em_mods_assessed[[x]],
                                                              input_cell_type = names(em_mods)[x],

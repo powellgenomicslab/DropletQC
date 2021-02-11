@@ -45,7 +45,8 @@ Imports:
     GenomeInfoDb,
     ks,
     ggpubr,
-    mclust
+    mclust,
+    stringr
 Suggests: 
     knitr,
     rmarkdown

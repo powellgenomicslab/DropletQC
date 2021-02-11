@@ -44,8 +44,8 @@ represent the population of empty droplets.
 \examples{
 data("qc_examples")
 gbm <- qc_examples[qc_examples$sample=="GBM",]
-gbm <- data.frame(nf=gbm$nuclear_fraction_droplet_qc, umi=gbm$umi_count)
-gbm.ed <- identify_empty_drops(nf_umi = gbm)
+gbm.ed <- gbm[,c("nuclear_fraction_droplet_qc","umi_count")]
+gbm.ed <- identify_empty_drops(nf_umi = gbm.ed)
 head(gbm.ed)
 table(gbm.ed$cell_status)
 

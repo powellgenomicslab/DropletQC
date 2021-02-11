@@ -18,7 +18,7 @@ nuclear fraction and a column defining each cell as a "cell" or
 model results}
 }
 \value{
-patchwork, three ggplots combined using the patchwork package
+ggarrange, three ggplots combined using \code{ggpubr::ggarrange}
 }
 \description{
 This is a helper function called intarnally by the

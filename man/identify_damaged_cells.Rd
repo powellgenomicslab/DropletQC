@@ -6,9 +6,10 @@
 \usage{
 identify_damaged_cells(
   nf_umi_ed_ct,
-  nf_sep = 0.2,
+  nf_sep = 0.15,
   umi_sep_perc = 50,
-  output_plots = FALSE
+  output_plots = FALSE,
+  verbose = TRUE
 )
 }
 \arguments{
@@ -27,13 +28,16 @@ the damaged cell population must be at less than 7,000 UMIs if the umi_sep
 parameter is 30 (\%)}
 
 \item{output_plots}{logical, whether or not to return plots}
+
+\item{verbose}{logical, whether to print updates and progress while fitting
+with EM}
 }
 \value{
 list, of length two. The first element in the list contains a data
 frame with the same dimensions input to the \code{nf_umi_ed_ct} argument, with
-damaged cells now recorded in the third column. The second element is NULL
+"damaged_cell" now recorded in the third column. The second element is NULL
 unless \code{output_plots}=TRUE. If requested, three plots are returned for each
-cell type in a named list, combined using the patchwork package. For each
+cell type in a named list, combined using \code{ggpubr::ggarrange}. For each
 cell type, the first plot illustrates the cell and damaged cell populations
 (if any) in a plot of nuclear fraction vs log10(UMI counts). Damaged cells
 are expected to be in the lower right portion of the plot(lower UMI counts
@@ -62,5 +66,14 @@ are assumed to have equal variance (mclust model name "EEI").
 }
 \examples{
 #1
+data("qc_examples")
+gbm <- qc_examples[qc_examples$sample=="MB",]
+gbm.ed <- gbm[,c("nuclear_fraction_droplet_qc","umi_count")]
+gbm.ed <- identify_empty_drops(nf_umi = gbm.ed)
+gbm.ed$cell_type <- gbm$cell_type
+gbm.ed.dc <- identify_damaged_cells(gbm.ed, verbose=FALSE)
+gbm.ed.dc <- gbm.ed.dc[[1]]
+head(gbm.ed.dc)
+table(gbm.ed.dc$cell_status)
 
 }
