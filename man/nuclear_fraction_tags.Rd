@@ -103,7 +103,7 @@ containing cellranger output (outs).
 nf1 <- nuclear_fraction_tags(
     outs = system.file("extdata", "outs", package =
     "dropletQC"),
-     tiles = 10, cores = 1, verbose = FALSE)
+     tiles = 1, cores = 1, verbose = FALSE)
 head(nf1)
 
 nf2 <- nuclear_fraction_tags(
@@ -112,7 +112,7 @@ nf2 <- nuclear_fraction_tags(
    barcodes = c("AAAAGTCACTTACTTG-1",
                 "AAAAGTGGATCTCTAA-1",
                 "AAACACGTTCTCATCG-1"),
-   tiles = 10, cores = 1,
+   tiles = 1, cores = 1,
    verbose = FALSE)
 nf2
 

@@ -52,9 +52,11 @@ check_bam_anno <- function(bam_file, annotation){
   }
 
   # Collapse vector of seqids for printing output
-  if (length(missing_from_anno) < 12) {
+  if (length(missing_from_anno) >0 & length(missing_from_anno) < 12) {
     missing_from_anno <- paste(missing_from_anno, collapse = ", ")
-  } else{
+  }
+
+  if (length(missing_from_anno) >12) {
     missing_from_anno <-
       paste0(paste(utils::head(missing_from_anno), collapse = ','),
              "...",
@@ -163,7 +165,7 @@ get_transcript_ranges <- function(input_annotation,
 intron_exon_overlap <- function(block,
                                 bam_file_ref,
                                 cell_barcodes,
-                                cb_tag="CB"){
+                                cb_tag){
 
   # Import all reads that fall within the genomic interval containing the exon
   # and intron ranges
@@ -248,15 +250,16 @@ intron_exon_overlap <- function(block,
 #'@export
 #'
 #' @examples
-#' #gbm_nf <- nuclear_fraction_annotation(
-#' #  annotation_path = "data/human.gtf",
-#' #  annotation_format = "auto",
-#' #  bam = "data/GBM/outs/possorted_genome_bam.bam",
-#' #  bam_index =  "data/GBM/outs/possorted_genome_bam.bam.bai",
-#' #  barcodes = "data/GBM/outs/filtered_feature_bc_matrix/barcodes.tsv.gz",
-#' #  cell_barcode_tag = "CB",
-#' #  cores = 16,
-#' #  verbose = TRUE)
+#' nf3 <- nuclear_fraction_annotation(
+#'  annotation_path = system.file("extdata/outs/chr1.gff3",
+#'   package = "dropletQC"),
+#'  bam = system.file("extdata/outs/possorted_genome_bam.bam",
+#'   package = "dropletQC"),
+#'  barcodes = system.file(
+#'  "extdata/outs/filtered_feature_bc_matrix/barcodes.tsv.gz",
+#'   package = "dropletQC"),
+#'  tiles = 1, cores = 1, verbose = FALSE)
+#' head(nf3)
 #'
 nuclear_fraction_annotation <- function(
   annotation_path,

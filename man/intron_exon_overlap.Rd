@@ -4,7 +4,7 @@
 \alias{intron_exon_overlap}
 \title{Determine read overlap with exon and intron intervals}
 \usage{
-intron_exon_overlap(block, bam_file_ref, cell_barcodes, cb_tag = "CB")
+intron_exon_overlap(block, bam_file_ref, cell_barcodes, cb_tag)
 }
 \arguments{
 \item{block}{GRanges, contains merged exon and intron intervals}

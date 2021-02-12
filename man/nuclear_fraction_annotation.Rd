@@ -66,14 +66,15 @@ aligned to intronic or exonic regions, but it is also slower, because this
 information needs to be calculated.
 }
 \examples{
-#gbm_nf <- nuclear_fraction_annotation(
-#  annotation_path = "data/human.gtf",
-#  annotation_format = "auto",
-#  bam = "data/GBM/outs/possorted_genome_bam.bam",
-#  bam_index =  "data/GBM/outs/possorted_genome_bam.bam.bai",
-#  barcodes = "data/GBM/outs/filtered_feature_bc_matrix/barcodes.tsv.gz",
-#  cell_barcode_tag = "CB",
-#  cores = 16,
-#  verbose = TRUE)
+nf3 <- nuclear_fraction_annotation(
+ annotation_path = system.file("extdata/outs/chr1.gff3",
+  package = "dropletQC"),
+ bam = system.file("extdata/outs/possorted_genome_bam.bam",
+  package = "dropletQC"),
+ barcodes = system.file(
+ "extdata/outs/filtered_feature_bc_matrix/barcodes.tsv.gz",
+  package = "dropletQC"),
+ tiles = 1, cores = 1, verbose = FALSE)
+head(nf3)
 
 }

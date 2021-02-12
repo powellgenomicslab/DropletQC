@@ -261,9 +261,6 @@ identify_damaged_cells <- function(nf_umi_ed_ct,
                                    verbose=TRUE){
 
   # Check nf_umi_ed_ct argument
-
-
-
   if (any(class(nf_umi_ed_ct) == "data.frame")) {
 
     # Check four columns exist
