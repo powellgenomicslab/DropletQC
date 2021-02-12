@@ -87,71 +87,69 @@
 <a href="#dropletqc" class="anchor"></a>dropletQC</h1></div>
 <!-- badges: start -->
 <!-- badges: end -->
-<p>This is a simple R package to calculate a QC metric, the nuclear fraction score, for single cell RNA-seq (scRNA-seq) datasets. This statistic is simply:</p>
+<p>This is a simple R package to calculate, for every requested cell barcode in a provided scRNA-seq BAM file, the nuclear fraction score:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>nuclear fraction <span class="ot">=</span> intronic reads <span class="sc">/</span> (intronic  reads  <span class="sc">+</span>  exonic  reads)</span></code></pre></div>
-<p>In words: for each cell barcode provided, the proportion of reads that originated from intronic regions is calculated. These RNA fragments originate from unspliced (nuclear) pre-mRNA, hence the name “nuclear fraction”. This metric can be used to identify two populations that you may want flag or exclude from your dataset prior to downstream analysis:</p>
+<p>The score captures the proportion of reads from intronic regions. These RNA fragments originate from unspliced (nuclear) pre-mRNA, hence the name “nuclear fraction”. This score can be used to help identify:</p>
 <ol>
-<li><p>“Empty” droplets containing ambient RNA, characterised by a low nuclear fraction score</p></li>
-<li><p>Droplets containing damaged cells, characterised by a high nuclear fraction score</p></li>
+<li><p>“Empty” droplets containing ambient RNA: low nuclear fraction score and low UMI count</p></li>
+<li><p>Droplets containing damaged cells: high nuclear fraction score and low UMI count</p></li>
 </ol>
-<p>The biological principle behind this is intuitive. Sheared cell membranes of damaged cells in the input cell suspension release cytoplasmic RNA into solution while the nuclear envelope will often remain intact. As a result, RNA released from stressed or damaged cells will consist of mostly mature cytoplasmic mRNA and will be relatively depleted of unspliced nuclear precursor mRNA.</p>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
-<p>You can install dropletQC from <a href="https://github.com/">GitHub</a> with:</p>
+<p>You can install dropletQC with:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># install.packages("devtools")</span>
 <span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org//reference/remote-reexports.html">install_github</a></span><span class="op">(</span><span class="st">"WalterMuskovic/dropletQC"</span>, build_vignettes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 </div>
-<div id="examples" class="section level2">
+<div id="calculating-the-nuclear-fraction" class="section level2">
 <h2 class="hasAnchor">
-<a href="#examples" class="anchor"></a>Examples</h2>
-<p>The R packages contains two (to be continued)</p>
-<p>The simplest way to calculate the nuclear fraction score is to simply point to the ‘outs’ directory produced by the Cell Ranger software:</p>
+<a href="#calculating-the-nuclear-fraction" class="anchor"></a>Calculating the nuclear fraction</h2>
+<p>There are two functions which can be used to calculate the nuclear fraction; <code>nuclear_fraction_tags</code> and <code>nuclear_fraction_annotation</code>.</p>
+<p>If your BAM file contains region tags which identify aligned reads as intronic or exonic, such as those produced by 10x Genomics’ CellRanger software, then the simplest and fastest way to calculate the nuclear fraction is to point <code>nuclear_fraction_tags</code> to the directory:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">dropletQC</span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://waltermuskovic.github.io/dropletQC">dropletQC</a></span><span class="op">)</span>
 <span class="va">nf1</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/nuclear_fraction_tags.html">nuclear_fraction_tags</a></span><span class="op">(</span>
     outs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"outs"</span>, package <span class="op">=</span> <span class="st">"dropletQC"</span><span class="op">)</span>,
-     tiles <span class="op">=</span> <span class="fl">10</span>, cores <span class="op">=</span> <span class="fl">1</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
+     tiles <span class="op">=</span> <span class="fl">1</span>, cores <span class="op">=</span> <span class="fl">1</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">nf1</span><span class="op">)</span>
 <span class="co">#&gt;                    nuclear_fraction</span>
-<span class="co">#&gt; AAAAGTCACTTACTTG-1       0.05025126</span>
-<span class="co">#&gt; AAAAGTGGATCTCTAA-1       0.03804348</span>
-<span class="co">#&gt; AAACACGTTCTCATCG-1       0.02985075</span>
-<span class="co">#&gt; AAACAGGCAGCGACTG-1       0.06451613</span>
-<span class="co">#&gt; AAAGCAGTTACGAAGA-1       0.04624277</span>
-<span class="co">#&gt; AAAGCGGATGCATGGT-1       0.03821656</span></code></pre></div>
-<p>This assumes the following three files are present in the specified directory:</p>
+<span class="co">#&gt; AAAAGTCACTTACTTG-1        0.9032698</span>
+<span class="co">#&gt; AAAAGTGGATCTCTAA-1        0.4032761</span>
+<span class="co">#&gt; AAAGCAGTTACGAAGA-1        0.3957704</span>
+<span class="co">#&gt; AACGACTTCAATATGT-1        0.4004525</span>
+<span class="co">#&gt; AACGGCGTCATCTGGA-1        0.8845109</span>
+<span class="co">#&gt; AAGCAGGGGTCGCGAA-1        0.3929376</span></code></pre></div>
+<p>Alternatively, you can point <code>nuclear_fraction_annotation</code> to a gene annotation, BAM and barcode files:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/list.files.html">list.files</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"outs"</span>, package <span class="op">=</span> <span class="st">"dropletQC"</span><span class="op">)</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="co">#&gt; [1] "filtered_feature_bc_matrix/barcodes.tsv.gz"</span>
-<span class="co">#&gt; [2] "possorted_genome_bam.bam"                  </span>
-<span class="co">#&gt; [3] "possorted_genome_bam.bam.bai"</span></code></pre></div>
-<p>Alternatively, if you don’t have this directory structure or your files have been renamed e.g. they were given to you by a collaborator, you can specify the paths to the required files directly:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">nf2</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/nuclear_fraction_tags.html">nuclear_fraction_tags</a></span><span class="op">(</span>
-   bam <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"outs"</span>,<span class="st">"possorted_genome_bam.bam"</span>, package <span class="op">=</span>
-   <span class="st">"dropletQC"</span><span class="op">)</span>,
-   barcodes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"AAAAGTCACTTACTTG-1"</span>,
-                <span class="st">"AAAAGTGGATCTCTAA-1"</span>,
-                <span class="st">"AAACACGTTCTCATCG-1"</span><span class="op">)</span>,
-   tiles <span class="op">=</span> <span class="fl">10</span>, cores <span class="op">=</span> <span class="fl">1</span>,
-   verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-<span class="va">nf2</span>
+<code class="sourceCode R"><span class="va">nf2</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/nuclear_fraction_annotation.html">nuclear_fraction_annotation</a></span><span class="op">(</span>
+ annotation_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata/outs/chr1.gff3"</span>,package <span class="op">=</span> <span class="st">"dropletQC"</span><span class="op">)</span>,
+ bam <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata/outs/possorted_genome_bam.bam"</span>,package <span class="op">=</span> <span class="st">"dropletQC"</span><span class="op">)</span>,
+ barcodes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata/outs/filtered_feature_bc_matrix/barcodes.tsv.gz"</span>,package <span class="op">=</span> <span class="st">"dropletQC"</span><span class="op">)</span>,
+ tiles <span class="op">=</span> <span class="fl">1</span>, cores <span class="op">=</span> <span class="fl">1</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
+<span class="co">#&gt; [1] "Extracting exon and intron ranges from provided annotation file:"</span>
+<span class="co">#&gt; [1] "/private/var/folders/cs/qxrqw1nj61gdhl_hl29y0nv00000gp/T/RtmprS5zuk/temp_libpath14ab8797909b4/dropletQC/extdata/outs/chr1.gff3"</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">nf2</span><span class="op">)</span>
 <span class="co">#&gt;                    nuclear_fraction</span>
-<span class="co">#&gt; AAAAGTCACTTACTTG-1       0.05025126</span>
-<span class="co">#&gt; AAAAGTGGATCTCTAA-1       0.03804348</span>
-<span class="co">#&gt; AAACACGTTCTCATCG-1       0.02985075</span></code></pre></div>
-<p>Note that here we have provided a vector of requested barcode IDs to the <code>barcodes</code> argument rather than the path to a file on disk <code>barcodes.tsv.gz</code>. Either is fine, just make sure the format of your barcodes matches the BAM file.</p>
+<span class="co">#&gt; AAAAGTCACTTACTTG-1        0.9032698</span>
+<span class="co">#&gt; AAAAGTGGATCTCTAA-1        0.4032761</span>
+<span class="co">#&gt; AAAGCAGTTACGAAGA-1        0.3957704</span>
+<span class="co">#&gt; AACGACTTCAATATGT-1        0.4004525</span>
+<span class="co">#&gt; AACGGCGTCATCTGGA-1        0.8845109</span>
+<span class="co">#&gt; AAGCAGGGGTCGCGAA-1        0.3929376</span></code></pre></div>
+<p>This methods is more flexible, as it makes no assumptions about how your BAM file was produced - but it will take longer. Take care that the provided barcodes match the barcode structure in the BAM file.</p>
+</div>
+<div id="identifying-empty-droplet-and-damaged-cells" class="section level2">
+<h2 class="hasAnchor">
+<a href="#identifying-empty-droplet-and-damaged-cells" class="anchor"></a>Identifying empty droplet and damaged cells</h2>
+<p>Once the nuclear fraction score has been calculated, the <code>identify_empty_drops</code> and <code>identify_damaged_cells</code> functions can be used to assist in identifying each these populations. Empty or damaged cells are flagged, not removed.</p>
 </div>
 <div id="more-information" class="section level2">
 <h2 class="hasAnchor">
 <a href="#more-information" class="anchor"></a>More information</h2>
-<p>For more details see our paper published in <strong>Journal Name</strong>:</p>
+<p>For a detailed discussion see our paper published in <strong>Journal Name</strong>:</p>
 <p><a href="https://www.google.com">paper title here</a></p>
-<p>and the associated GitHub repo:</p>
-<p><a href="https://www.google.com">public GitHub repo</a></p>
-<p>For more information about how the package works and some tips on how to interpret the nuclear fraction score using real-world examples, see <code><a href="articles/dropletQC.html">vignette("dropletQC")</a></code>.</p>
+<p>For more information about the functions included in the package, including tips on how to assess the nuclear fraction score using real-world examples, see the <a href="https://waltermuskovic.github.io/dropletQC/articles/dropletQC.html">package vignette</a>.</p>
 </div>
 </div>
   </div>

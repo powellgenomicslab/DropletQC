@@ -236,28 +236,28 @@ names of the rows will match those of the input cell barcodes.</p>
     <pre class="examples"><div class='input'><span class='va'>nf1</span> <span class='op'>&lt;-</span> <span class='fu'>nuclear_fraction_tags</span><span class='op'>(</span>
     outs <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"extdata"</span>, <span class='st'>"outs"</span>, package <span class='op'>=</span>
     <span class='st'>"dropletQC"</span><span class='op'>)</span>,
-     tiles <span class='op'>=</span> <span class='fl'>10</span>, cores <span class='op'>=</span> <span class='fl'>1</span>, verbose <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
+     tiles <span class='op'>=</span> <span class='fl'>1</span>, cores <span class='op'>=</span> <span class='fl'>1</span>, verbose <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>nf1</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;                    nuclear_fraction
-#&gt; AAAAGTCACTTACTTG-1       0.05025126
-#&gt; AAAAGTGGATCTCTAA-1       0.03804348
-#&gt; AAACACGTTCTCATCG-1       0.02985075
-#&gt; AAACAGGCAGCGACTG-1       0.06451613
-#&gt; AAAGCAGTTACGAAGA-1       0.04624277
-#&gt; AAAGCGGATGCATGGT-1       0.03821656</div><div class='input'>
+#&gt; AAAAGTCACTTACTTG-1        0.9032698
+#&gt; AAAAGTGGATCTCTAA-1        0.4032761
+#&gt; AAAGCAGTTACGAAGA-1        0.3957704
+#&gt; AACGACTTCAATATGT-1        0.4004525
+#&gt; AACGGCGTCATCTGGA-1        0.8845109
+#&gt; AAGCAGGGGTCGCGAA-1        0.3929376</div><div class='input'>
 <span class='va'>nf2</span> <span class='op'>&lt;-</span> <span class='fu'>nuclear_fraction_tags</span><span class='op'>(</span>
    bam <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"extdata"</span>, <span class='st'>"outs"</span>,<span class='st'>"possorted_genome_bam.bam"</span>, package <span class='op'>=</span>
    <span class='st'>"dropletQC"</span><span class='op'>)</span>,
    barcodes <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"AAAAGTCACTTACTTG-1"</span>,
                 <span class='st'>"AAAAGTGGATCTCTAA-1"</span>,
                 <span class='st'>"AAACACGTTCTCATCG-1"</span><span class='op'>)</span>,
-   tiles <span class='op'>=</span> <span class='fl'>10</span>, cores <span class='op'>=</span> <span class='fl'>1</span>,
+   tiles <span class='op'>=</span> <span class='fl'>1</span>, cores <span class='op'>=</span> <span class='fl'>1</span>,
    verbose <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
 <span class='va'>nf2</span>
 </div><div class='output co'>#&gt;                    nuclear_fraction
-#&gt; AAAAGTCACTTACTTG-1       0.05025126
-#&gt; AAAAGTGGATCTCTAA-1       0.03804348
-#&gt; AAACACGTTCTCATCG-1       0.02985075</div><div class='input'>
+#&gt; AAAAGTCACTTACTTG-1        0.9032698
+#&gt; AAAAGTGGATCTCTAA-1        0.4032761
+#&gt; AAACACGTTCTCATCG-1        0.0000000</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

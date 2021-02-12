@@ -4,7 +4,12 @@
 \alias{get_transcript_ranges}
 \title{Get transcript ranges}
 \usage{
-get_transcript_ranges(input_annotation, input_annotation_format, ntiles)
+get_transcript_ranges(
+  input_annotation,
+  input_annotation_format,
+  ntiles,
+  verbose_output
+)
 }
 \arguments{
 \item{input_annotation}{character, should be a character vector pointing to
@@ -17,6 +22,8 @@ GenomicFeatures::makeTxDbFromGFF(). This should generally just be left as
 
 \item{ntiles}{integer, the number of blocks that exons and introns should be
 grouped into}
+
+\item{verbose_output}{logical, whether to print messages}
 }
 \value{
 GRangesList. Contains GRanges defining merged exons and introns

@@ -128,7 +128,12 @@ the function was written as a simple helper function to be called
 general use.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>get_transcript_ranges</span><span class='op'>(</span><span class='va'>input_annotation</span>, <span class='va'>input_annotation_format</span>, <span class='va'>ntiles</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>get_transcript_ranges</span><span class='op'>(</span>
+  <span class='va'>input_annotation</span>,
+  <span class='va'>input_annotation_format</span>,
+  <span class='va'>ntiles</span>,
+  <span class='va'>verbose_output</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -149,6 +154,10 @@ GenomicFeatures::makeTxDbFromGFF(). This should generally just be left as
       <th>ntiles</th>
       <td><p>integer, the number of blocks that exons and introns should be
 grouped into</p></td>
+    </tr>
+    <tr>
+      <th>verbose_output</th>
+      <td><p>logical, whether to print messages</p></td>
     </tr>
     </table>
 

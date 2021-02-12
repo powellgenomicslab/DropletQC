@@ -88,6 +88,7 @@ check_bam_anno <- function(bam_file, annotation){
 #'  "auto"
 #'@param ntiles integer, the number of blocks that exons and introns should be
 #'  grouped into
+#'@param verbose_output logical, whether to print messages
 #'
 #'@return GRangesList. Contains GRanges defining merged exons and introns
 #'  grouped into ~ntiles blocks. When defining intronic regions, any regions
@@ -97,7 +98,8 @@ check_bam_anno <- function(bam_file, annotation){
 #'@keywords internal
 get_transcript_ranges <- function(input_annotation,
                                   input_annotation_format,
-                                  ntiles){
+                                  ntiles,
+                                  verbose_output){
 
   print("Extracting exon and intron ranges from provided annotation file:")
   print(input_annotation)
@@ -327,7 +329,8 @@ nuclear_fraction_annotation <- function(
   ## Get transcript, exon and intron ranges
   tx_ranges <- get_transcript_ranges(input_annotation = annotation_path,
                                      input_annotation_format = annotation_format,
-                                     ntiles=tiles)
+                                     ntiles=tiles,
+                                     verbose_output=verbose)
 
   # Remove ranges from sequences not in the BAM file
   bam_info <- Rsamtools::idxstatsBam(bam)

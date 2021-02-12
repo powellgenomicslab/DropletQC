@@ -105,9 +105,9 @@
               tag <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"CB"</span>, <span class="st">"RE"</span><span class="op">)</span>,
               which <span class="op">=</span> <span class="va">intervals</span><span class="op">[</span><span class="va">x</span><span class="op">]</span>
            <span class="op">)</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">tag</span><span class="op">)</span></code></pre></div>
-<pre><code>##    [,1]                 [,2]                 [,3]                
-## CB "AAAAGTCACTTACTTG-1" "AAAAGTCACTTACTTG-1" "AAAAGTCACTTACTTG-1"
-## RE "E"                  "I"                  "N"</code></pre>
+<pre><code>##    [,1] [,2] [,3]
+## CB NULL NULL NULL
+## RE NULL NULL NULL</code></pre>
 <p>‘CB’ is the error-corrected cell barcode sequence and ‘RE’ is one of three single characters representing the region type of the read; E (exonic), N (intronic) or I (intergenic). The nuclear fraction score that is returned by <code>nuclear_fraction_tags</code> is simply E/(E+N) for each provided cell barcode. To speed up the processing of the (usually large) BAM file, dropletQC splits the BAM file into a number of genomic tiles and processes them in parallel by internally calling <code><a href="https://rdrr.io/pkg/furrr/man/future_map.html">furrr::future_map</a></code>.</p>
 </div>
 <div id="calculating-the-nuclear-fraction-score" class="section level2">
@@ -115,7 +115,7 @@
 <a href="#calculating-the-nuclear-fraction-score" class="anchor"></a>Calculating the nuclear fraction score</h2>
 <p>There are two ways to use <code>nuclear_fraction_tags</code>; point it to the Cell Ranger ‘outs’ directory or point it to the individual files. The simplest way is to rely on the consistent structure of the ‘outs’ directory produced by the Cell Ranger software:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">dropletQC</span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://waltermuskovic.github.io/dropletQC">dropletQC</a></span><span class="op">)</span>
 
 <span class="va">nf1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nuclear_fraction_tags.html">nuclear_fraction_tags</a></span><span class="op">(</span>
    outs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"outs"</span>, package <span class="op">=</span> <span class="st">"dropletQC"</span><span class="op">)</span>,
@@ -125,19 +125,20 @@
 <span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">nf1</span><span class="op">)</span></code></pre></div>
 <pre><code>##                    nuclear_fraction
-## AAAAGTCACTTACTTG-1       0.05025126
-## AAAAGTGGATCTCTAA-1       0.03804348
-## AAACACGTTCTCATCG-1       0.02985075
-## AAACAGGCAGCGACTG-1       0.06451613
-## AAAGCAGTTACGAAGA-1       0.04624277
-## AAAGCGGATGCATGGT-1       0.03821656</code></pre>
+## AAAAGTCACTTACTTG-1        0.9032698
+## AAAAGTGGATCTCTAA-1        0.4032761
+## AAAGCAGTTACGAAGA-1        0.3957704
+## AACGACTTCAATATGT-1        0.4004525
+## AACGGCGTCATCTGGA-1        0.8845109
+## AAGCAGGGGTCGCGAA-1        0.3929376</code></pre>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># This assumes the following three files are present in the specified directory:</span>
 <span class="fu"><a href="https://rdrr.io/r/base/list.files.html">list.files</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"outs"</span>, package <span class="op">=</span> <span class="st">"dropletQC"</span><span class="op">)</span>,
            recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
-<pre><code>## [1] "filtered_feature_bc_matrix/barcodes.tsv.gz"
-## [2] "possorted_genome_bam.bam"                  
-## [3] "possorted_genome_bam.bam.bai"</code></pre>
+<pre><code>## [1] "chr1.gff3"                                 
+## [2] "filtered_feature_bc_matrix/barcodes.tsv.gz"
+## [3] "possorted_genome_bam.bam"                  
+## [4] "possorted_genome_bam.bam.bai"</code></pre>
 <p>If you don’t have this directory structure, or your files have been renamed e.g. they were given to you by a collaborator, you can specify the paths to the required files directly:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">nf2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nuclear_fraction_tags.html">nuclear_fraction_tags</a></span><span class="op">(</span>
@@ -154,9 +155,9 @@
 <span class="op">)</span>
 <span class="va">nf2</span></code></pre></div>
 <pre><code>##                    nuclear_fraction
-## AAAAGTCACTTACTTG-1       0.05025126
-## AAAAGTGGATCTCTAA-1       0.03804348
-## AAACACGTTCTCATCG-1       0.02985075</code></pre>
+## AAAAGTCACTTACTTG-1        0.9032698
+## AAAAGTGGATCTCTAA-1        0.4032761
+## AAACACGTTCTCATCG-1        0.0000000</code></pre>
 <p>Note that here we have provided a vector of requested barcode IDs to the barcodes argument rather than the path to a file on disk ‘barcodes.tsv.gz’. Either is fine, just make sure the format of your barcodes matches the BAM file.</p>
 </div>
 <div id="assessing-the-nuclear-fraction-score" class="section level2">

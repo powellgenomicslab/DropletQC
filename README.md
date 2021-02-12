@@ -6,30 +6,20 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-This is a simple R package to calculate a QC metric, the nuclear
-fraction score, for single cell RNA-seq (scRNA-seq) datasets. This
-statistic is simply:
+This is a simple R package to calculate, for every requested cell
+barcode in a provided scRNA-seq BAM file, the nuclear fraction score:
 
     nuclear fraction = intronic reads / (intronic  reads  +  exonic  reads)
 
-In words: for each cell barcode provided, the proportion of reads that
-originated from intronic regions is calculated. These RNA fragments
-originate from unspliced (nuclear) pre-mRNA, hence the name “nuclear
-fraction”. This metric can be used to identify two populations that you
-may want flag or exclude from your dataset prior to downstream analysis:
+The score captures the proportion of reads from intronic regions. These
+RNA fragments originate from unspliced (nuclear) pre-mRNA, hence the
+name “nuclear fraction”. This score can be used to help identify:
 
-1.  “Empty” droplets containing ambient RNA, characterised by a low
-    nuclear fraction score
+1.  “Empty” droplets containing ambient RNA: low nuclear fraction score
+    and low UMI count
 
-2.  Droplets containing damaged cells, characterised by a high nuclear
-    fraction score
-
-The biological principle behind this is intuitive. Sheared cell
-membranes of damaged cells in the input cell suspension release
-cytoplasmic RNA into solution while the nuclear envelope will often
-remain intact. As a result, RNA released from stressed or damaged cells
-will consist of mostly mature cytoplasmic mRNA and will be relatively
-depleted of unspliced nuclear precursor mRNA.
+2.  Droplets containing damaged cells: high nuclear fraction score and
+    low UMI count
 
 ## Installation
 
@@ -40,74 +30,70 @@ You can install dropletQC with:
 devtools::install_github("WalterMuskovic/dropletQC", build_vignettes = TRUE)
 ```
 
-## Examples
+## Calculating the nuclear fraction
 
-The R packages contains two (to be continued)
+There are two functions which can be used to calculate the nuclear
+fraction; `nuclear_fraction_tags` and `nuclear_fraction_annotation`.
 
-The simplest way to calculate the nuclear fraction score is to simply
-point to the ‘outs’ directory produced by the Cell Ranger software:
+If your BAM file contains region tags which identify aligned reads as
+intronic or exonic, such as those produced by 10x Genomics’ CellRanger
+software, then the simplest and fastest way to calculate the nuclear
+fraction is to point `nuclear_fraction_tags` to the directory:
 
 ``` r
 library(dropletQC)
 nf1 <- nuclear_fraction_tags(
     outs = system.file("extdata", "outs", package = "dropletQC"),
-     tiles = 10, cores = 1, verbose = FALSE)
+     tiles = 1, cores = 1, verbose = FALSE)
 head(nf1)
 #>                    nuclear_fraction
-#> AAAAGTCACTTACTTG-1       0.05025126
-#> AAAAGTGGATCTCTAA-1       0.03804348
-#> AAACACGTTCTCATCG-1       0.02985075
-#> AAACAGGCAGCGACTG-1       0.06451613
-#> AAAGCAGTTACGAAGA-1       0.04624277
-#> AAAGCGGATGCATGGT-1       0.03821656
+#> AAAAGTCACTTACTTG-1        0.9032698
+#> AAAAGTGGATCTCTAA-1        0.4032761
+#> AAAGCAGTTACGAAGA-1        0.3957704
+#> AACGACTTCAATATGT-1        0.4004525
+#> AACGGCGTCATCTGGA-1        0.8845109
+#> AAGCAGGGGTCGCGAA-1        0.3929376
 ```
 
-This assumes the following three files are present in the specified
-directory:
+Alternatively, you can point `nuclear_fraction_annotation` to a gene
+annotation, BAM and barcode files:
 
 ``` r
-list.files(system.file("extdata", "outs", package = "dropletQC"), recursive = TRUE)
-#> [1] "filtered_feature_bc_matrix/barcodes.tsv.gz"
-#> [2] "possorted_genome_bam.bam"                  
-#> [3] "possorted_genome_bam.bam.bai"
-```
-
-Alternatively, if you don’t have this directory structure or your files
-have been renamed e.g. they were given to you by a collaborator, you can
-specify the paths to the required files directly:
-
-``` r
-nf2 <- nuclear_fraction_tags(
-   bam = system.file("extdata", "outs","possorted_genome_bam.bam", package =
-   "dropletQC"),
-   barcodes = c("AAAAGTCACTTACTTG-1",
-                "AAAAGTGGATCTCTAA-1",
-                "AAACACGTTCTCATCG-1"),
-   tiles = 10, cores = 1,
-   verbose = FALSE)
-nf2
+nf2 <- nuclear_fraction_annotation(
+ annotation_path = system.file("extdata/outs/chr1.gff3",package = "dropletQC"),
+ bam = system.file("extdata/outs/possorted_genome_bam.bam",package = "dropletQC"),
+ barcodes = system.file("extdata/outs/filtered_feature_bc_matrix/barcodes.tsv.gz",package = "dropletQC"),
+ tiles = 1, cores = 1, verbose = FALSE)
+#> [1] "Extracting exon and intron ranges from provided annotation file:"
+#> [1] "/private/var/folders/cs/qxrqw1nj61gdhl_hl29y0nv00000gp/T/RtmprS5zuk/temp_libpath14ab8797909b4/dropletQC/extdata/outs/chr1.gff3"
+head(nf2)
 #>                    nuclear_fraction
-#> AAAAGTCACTTACTTG-1       0.05025126
-#> AAAAGTGGATCTCTAA-1       0.03804348
-#> AAACACGTTCTCATCG-1       0.02985075
+#> AAAAGTCACTTACTTG-1        0.9032698
+#> AAAAGTGGATCTCTAA-1        0.4032761
+#> AAAGCAGTTACGAAGA-1        0.3957704
+#> AACGACTTCAATATGT-1        0.4004525
+#> AACGGCGTCATCTGGA-1        0.8845109
+#> AAGCAGGGGTCGCGAA-1        0.3929376
 ```
 
-Note that here we have provided a vector of requested barcode IDs to the
-`barcodes` argument rather than the path to a file on disk
-`barcodes.tsv.gz`. Either is fine, just make sure the format of your
-barcodes matches the BAM file.
+This methods is more flexible, as it makes no assumptions about how your
+BAM file was produced - but it will take longer. Take care that the
+provided barcodes match the barcode structure in the BAM file.
+
+## Identifying empty droplet and damaged cells
+
+Once the nuclear fraction score has been calculated, the
+`identify_empty_drops` and `identify_damaged_cells` functions can be
+used to assist in identifying each these populations. Empty or damaged
+cells are flagged, not removed.
 
 ## More information
 
-For more details see our paper published in **Journal Name**:
+For a detailed discussion see our paper published in **Journal Name**:
 
 [paper title here](https://www.google.com)
 
-and the associated GitHub repo:
-
-[public GitHub repo](https://www.google.com)
-
-For more information about how the package works and some tips on how to
-interpret the nuclear fraction score using real-world examples, see the
-[package
+For more information about the functions included in the package,
+including tips on how to assess the nuclear fraction score using
+real-world examples, see the [package
 vignette](https://waltermuskovic.github.io/dropletQC/articles/dropletQC.html).
