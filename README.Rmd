@@ -85,4 +85,4 @@ and the associated GitHub repo:
 
 [public GitHub repo](https://www.google.com)
 
-For more information about how the package works and some tips on how to interpret the nuclear fraction score using real-world examples, see `vignette("dropletQC")`.
+For more information about how the package works and some tips on how to interpret the nuclear fraction score using real-world examples, see the [package vignette](https://waltermuskovic.github.io/dropletQC/articles/dropletQC.html).
