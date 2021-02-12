@@ -64,7 +64,7 @@ head(nf2)
 This methods is more flexible, as it makes no assumptions about how your BAM file was produced - but it will take longer.
 Take care that the provided barcodes match the barcode structure in the BAM file.
 
-## Identifying empty droplet and damaged cells
+## Identifying empty droplets and damaged cells
 
 Once the nuclear fraction score has been calculated, the `identify_empty_drops` and `identify_damaged_cells` functions can be used to assist in identifying each these populations. Empty or damaged cells are flagged, not removed.
 

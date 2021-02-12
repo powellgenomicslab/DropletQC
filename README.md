@@ -64,8 +64,6 @@ nf2 <- nuclear_fraction_annotation(
  bam = system.file("extdata/outs/possorted_genome_bam.bam",package = "dropletQC"),
  barcodes = system.file("extdata/outs/filtered_feature_bc_matrix/barcodes.tsv.gz",package = "dropletQC"),
  tiles = 1, cores = 1, verbose = FALSE)
-#> [1] "Extracting exon and intron ranges from provided annotation file:"
-#> [1] "/private/var/folders/cs/qxrqw1nj61gdhl_hl29y0nv00000gp/T/RtmprS5zuk/temp_libpath14ab8797909b4/dropletQC/extdata/outs/chr1.gff3"
 head(nf2)
 #>                    nuclear_fraction
 #> AAAAGTCACTTACTTG-1        0.9032698
@@ -80,7 +78,7 @@ This methods is more flexible, as it makes no assumptions about how your
 BAM file was produced - but it will take longer. Take care that the
 provided barcodes match the barcode structure in the BAM file.
 
-## Identifying empty droplet and damaged cells
+## Identifying empty droplets and damaged cells
 
 Once the nuclear fraction score has been calculated, the
 `identify_empty_drops` and `identify_damaged_cells` functions can be

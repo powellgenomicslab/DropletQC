@@ -127,8 +127,6 @@
  bam <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata/outs/possorted_genome_bam.bam"</span>,package <span class="op">=</span> <span class="st">"dropletQC"</span><span class="op">)</span>,
  barcodes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata/outs/filtered_feature_bc_matrix/barcodes.tsv.gz"</span>,package <span class="op">=</span> <span class="st">"dropletQC"</span><span class="op">)</span>,
  tiles <span class="op">=</span> <span class="fl">1</span>, cores <span class="op">=</span> <span class="fl">1</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-<span class="co">#&gt; [1] "Extracting exon and intron ranges from provided annotation file:"</span>
-<span class="co">#&gt; [1] "/private/var/folders/cs/qxrqw1nj61gdhl_hl29y0nv00000gp/T/RtmprS5zuk/temp_libpath14ab8797909b4/dropletQC/extdata/outs/chr1.gff3"</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">nf2</span><span class="op">)</span>
 <span class="co">#&gt;                    nuclear_fraction</span>
 <span class="co">#&gt; AAAAGTCACTTACTTG-1        0.9032698</span>
@@ -139,9 +137,9 @@
 <span class="co">#&gt; AAGCAGGGGTCGCGAA-1        0.3929376</span></code></pre></div>
 <p>This methods is more flexible, as it makes no assumptions about how your BAM file was produced - but it will take longer. Take care that the provided barcodes match the barcode structure in the BAM file.</p>
 </div>
-<div id="identifying-empty-droplet-and-damaged-cells" class="section level2">
+<div id="identifying-empty-droplets-and-damaged-cells" class="section level2">
 <h2 class="hasAnchor">
-<a href="#identifying-empty-droplet-and-damaged-cells" class="anchor"></a>Identifying empty droplet and damaged cells</h2>
+<a href="#identifying-empty-droplets-and-damaged-cells" class="anchor"></a>Identifying empty droplets and damaged cells</h2>
 <p>Once the nuclear fraction score has been calculated, the <code>identify_empty_drops</code> and <code>identify_damaged_cells</code> functions can be used to assist in identifying each these populations. Empty or damaged cells are flagged, not removed.</p>
 </div>
 <div id="more-information" class="section level2">

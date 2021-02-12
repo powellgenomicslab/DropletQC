@@ -100,9 +100,10 @@ get_transcript_ranges <- function(input_annotation,
                                   input_annotation_format,
                                   ntiles,
                                   verbose_output){
-
-  print("Extracting exon and intron ranges from provided annotation file:")
-  print(input_annotation)
+  if(verbose_output){
+    print("Extracting exon and intron ranges from provided annotation file:")
+    print(input_annotation)
+  }
   txdb <- suppressWarnings(suppressMessages(
     GenomicFeatures::makeTxDbFromGFF(input_annotation,
                                      format = input_annotation_format)
