@@ -33,7 +33,7 @@ depleted of unspliced nuclear precursor mRNA.
 
 ## Installation
 
-You can install dropletQC from [GitHub](https://github.com/) with:
+You can install dropletQC with:
 
 ``` r
 # install.packages("devtools")

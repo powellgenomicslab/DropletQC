@@ -32,7 +32,7 @@ The biological principle behind this is intuitive. Sheared cell membranes of dam
 
 ## Installation
 
-You can install dropletQC from [GitHub](https://github.com/) with:
+You can install dropletQC with:
 
 ``` r
 # install.packages("devtools")
