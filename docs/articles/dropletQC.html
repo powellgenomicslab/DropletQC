@@ -80,10 +80,15 @@
 
     
     
-<div id="how-dropletqc-works" class="section level2">
+<div id="calculating-the-nuclear-fraction-score" class="section level2">
 <h2 class="hasAnchor">
-<a href="#how-dropletqc-works" class="anchor"></a>How dropletQC works</h2>
-<p>To calculate the nuclear fraction score for each provided cell barcode, we use the <code>nuclear_fraction_tags</code> function. This simply scans the ‘CB’ and ‘RE’ tags in the provided indexed Cell Ranger barcoded bam file. To access these tags it uses a strategy similar to this:</p>
+<a href="#calculating-the-nuclear-fraction-score" class="anchor"></a>Calculating the nuclear fraction score</h2>
+<p>To calculate the nuclear fraction score for each provided cell barcode, you can use either the <code>nuclear_fraction_tags</code> or <code>nuclear_fraction_annotation</code> function. If your BAM file contains region tags which mark each read as exonic/intronic, such as the barcoded BAM files output by 10x Genomics’ Cell Ranger, then use the <code>nuclear_fraction_tags</code> function.</p>
+</div>
+<div id="using-bam-region-tags" class="section level1">
+<h1 class="hasAnchor">
+<a href="#using-bam-region-tags" class="anchor"></a>Using BAM region tags</h1>
+<p>In Cell Ranger BAM files, the ‘CB’ tag defines the error-corrected cell barcode sequence and ‘RE’ is one of three single characters representing the region type of the read; E (exonic), N (intronic) or I (intergenic). ‘CB’ and ‘RE’ are used by default, but you can change these depending on the tags used in your BAM file, using the <code>cell_barcode_tag</code> and <code>region_type_tag</code> arguments. Internally, <code>nuclear_fraction_tags</code> parses the BAM file tags with <code><a href="https://rdrr.io/pkg/Rsamtools/man/scanBam.html">Rsamtools::scanBam</a></code>:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://bioconductor.org/packages/Rsamtools">Rsamtools</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://bioconductor.org/packages/GenomicRanges">GenomicRanges</a></span><span class="op">)</span>
@@ -95,31 +100,27 @@
 
 <span class="co"># Define some genomic intervals to pull data from</span>
 <span class="va">intervals</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/GenomicRanges/man/GRanges-class.html">GRanges</a></span><span class="op">(</span>seqnames <span class="op">=</span> <span class="st">"chr1"</span>,
-                     ranges <span class="op">=</span> <span class="fu">IRanges</span><span class="op">(</span>start <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1180</span>, <span class="fl">4880</span><span class="op">)</span>,
-                                      end <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">1190</span>, <span class="fl">4890</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
+                     ranges <span class="op">=</span> <span class="fu">IRanges</span><span class="op">(</span>start <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">5250</span>, <span class="fl">5609</span><span class="op">)</span>,
+                                      end <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">5252</span>, <span class="fl">5611</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co"># Pull CB and RE tags from the specified regions in the BAM file</span>
-<span class="fu"><a href="https://rdrr.io/r/base/lapply.html">sapply</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/lapply.html">sapply</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span>
    <span class="fu"><a href="https://rdrr.io/pkg/Rsamtools/man/scanBam.html">scanBam</a></span><span class="op">(</span><span class="va">bam_file</span>,
            param <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/Rsamtools/man/ScanBamParam-class.html">ScanBamParam</a></span><span class="op">(</span>
               tag <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"CB"</span>, <span class="st">"RE"</span><span class="op">)</span>,
               which <span class="op">=</span> <span class="va">intervals</span><span class="op">[</span><span class="va">x</span><span class="op">]</span>
            <span class="op">)</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">tag</span><span class="op">)</span></code></pre></div>
-<pre><code>##    [,1] [,2] [,3]
-## CB NULL NULL NULL
-## RE NULL NULL NULL</code></pre>
-<p>‘CB’ is the error-corrected cell barcode sequence and ‘RE’ is one of three single characters representing the region type of the read; E (exonic), N (intronic) or I (intergenic). The nuclear fraction score that is returned by <code>nuclear_fraction_tags</code> is simply E/(E+N) for each provided cell barcode. To speed up the processing of the (usually large) BAM file, dropletQC splits the BAM file into a number of genomic tiles and processes them in parallel by internally calling <code><a href="https://rdrr.io/pkg/furrr/man/future_map.html">furrr::future_map</a></code>.</p>
-</div>
-<div id="calculating-the-nuclear-fraction-score" class="section level2">
-<h2 class="hasAnchor">
-<a href="#calculating-the-nuclear-fraction-score" class="anchor"></a>Calculating the nuclear fraction score</h2>
-<p>There are two ways to use <code>nuclear_fraction_tags</code>; point it to the Cell Ranger ‘outs’ directory or point it to the individual files. The simplest way is to rely on the consistent structure of the ‘outs’ directory produced by the Cell Ranger software:</p>
+<pre><code>##    [,1]                 [,2]                
+## CB "TAGCTCACTGCTGCCA-1" "ACTTTTCCTTACCGAG-1"
+## RE "E"                  "N"</code></pre>
+<p>The nuclear fraction score returned by <code>nuclear_fraction_tags</code> for a Cell Ranger BAM file would be E/(E+N) for each provided cell barcode. To speed up the processing of the (usually large) BAM file, dropletQC splits the file into a number of genomic tiles and processes them in parallel by internally calling <code><a href="https://rdrr.io/pkg/furrr/man/future_map.html">furrr::future_map</a></code>. By default, 100 tiles are used and <code>future::availableCores() - 1</code> cores.</p>
+<p>There are two main ways to call <code>nuclear_fraction_tags</code>. If you used Cell Ranger for alignment, you can point it to the Cell Ranger ‘outs’ directory. This takes advantage of the consistent file names and structure of the ‘outs’:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://waltermuskovic.github.io/dropletQC">dropletQC</a></span><span class="op">)</span>
 
 <span class="va">nf1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nuclear_fraction_tags.html">nuclear_fraction_tags</a></span><span class="op">(</span>
    outs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"outs"</span>, package <span class="op">=</span> <span class="st">"dropletQC"</span><span class="op">)</span>,
-   tiles <span class="op">=</span> <span class="fl">10</span>,
+   tiles <span class="op">=</span> <span class="fl">1</span>,
    cores <span class="op">=</span> <span class="fl">1</span>,
    verbose <span class="op">=</span> <span class="cn">FALSE</span>
 <span class="op">)</span>
@@ -139,17 +140,16 @@
 ## [2] "filtered_feature_bc_matrix/barcodes.tsv.gz"
 ## [3] "possorted_genome_bam.bam"                  
 ## [4] "possorted_genome_bam.bam.bai"</code></pre>
-<p>If you don’t have this directory structure, or your files have been renamed e.g. they were given to you by a collaborator, you can specify the paths to the required files directly:</p>
+<p>If you don’t have this directory structure, or your files have been renamed, you can specify paths to the required files directly:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">nf2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nuclear_fraction_tags.html">nuclear_fraction_tags</a></span><span class="op">(</span>
-   bam <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"outs"</span>, <span class="st">"possorted_genome_bam.bam"</span>, package <span class="op">=</span>
-                        <span class="st">"dropletQC"</span><span class="op">)</span>,
+   bam <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"outs"</span>, <span class="st">"possorted_genome_bam.bam"</span>, package <span class="op">=</span><span class="st">"dropletQC"</span><span class="op">)</span>,
    barcodes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span>
       <span class="st">"AAAAGTCACTTACTTG-1"</span>,
       <span class="st">"AAAAGTGGATCTCTAA-1"</span>,
       <span class="st">"AAACACGTTCTCATCG-1"</span>
    <span class="op">)</span>,
-   tiles <span class="op">=</span> <span class="fl">10</span>,
+   tiles <span class="op">=</span> <span class="fl">1</span>,
    cores <span class="op">=</span> <span class="fl">1</span>,
    verbose <span class="op">=</span> <span class="cn">FALSE</span>
 <span class="op">)</span>
@@ -158,23 +158,41 @@
 ## AAAAGTCACTTACTTG-1        0.9032698
 ## AAAAGTGGATCTCTAA-1        0.4032761
 ## AAACACGTTCTCATCG-1        0.0000000</code></pre>
-<p>Note that here we have provided a vector of requested barcode IDs to the barcodes argument rather than the path to a file on disk ‘barcodes.tsv.gz’. Either is fine, just make sure the format of your barcodes matches the BAM file.</p>
+<p>Note that here we have provided a vector of requested barcode IDs to the barcodes argument rather than the path to a file on disk ‘barcodes.tsv.gz’. Either is fine, but the format of the barcodes must match the BAM file.</p>
 </div>
-<div id="assessing-the-nuclear-fraction-score" class="section level2">
+<div id="using-a-gene-annotation" class="section level1">
+<h1 class="hasAnchor">
+<a href="#using-a-gene-annotation" class="anchor"></a>Using a gene annotation</h1>
+<p>If your BAM file doesn’t contain region tags you can use the <code>nuclear_fraction_annotation</code> function and provide a gene annotation file. Each read in the BAM file will be assessed for overlap with exon and intron ranges extracted from the provided annotation. The genome build and chromosome names in the annotation should match the BAM file.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">nf3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nuclear_fraction_annotation.html">nuclear_fraction_annotation</a></span><span class="op">(</span>annotation_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata/outs/chr1.gff3"</span>,  package <span class="op">=</span> <span class="st">"dropletQC"</span><span class="op">)</span>,
+                                   bam <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata/outs/possorted_genome_bam.bam"</span>,  package <span class="op">=</span> <span class="st">"dropletQC"</span><span class="op">)</span>,
+                                   barcodes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span> <span class="st">"extdata/outs/filtered_feature_bc_matrix/barcodes.tsv.gz"</span>,package <span class="op">=</span> <span class="st">"dropletQC"</span><span class="op">)</span>,
+                                   tiles <span class="op">=</span> <span class="fl">1</span>, cores <span class="op">=</span> <span class="fl">1</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">nf3</span><span class="op">)</span></code></pre></div>
+<pre><code>##                    nuclear_fraction
+## AAAAGTCACTTACTTG-1        0.9032698
+## AAAAGTGGATCTCTAA-1        0.4032761
+## AAAGCAGTTACGAAGA-1        0.3957704
+## AACGACTTCAATATGT-1        0.4004525
+## AACGGCGTCATCTGGA-1        0.8845109
+## AAGCAGGGGTCGCGAA-1        0.3929376</code></pre>
+<div id="identifying-empty-droplets" class="section level2">
 <h2 class="hasAnchor">
-<a href="#assessing-the-nuclear-fraction-score" class="anchor"></a>Assessing the nuclear fraction score</h2>
-<p>Once you’ve calculated the nuclear fraction score you can use it to help identify damaged cells or empty droplets. We provide some pre-calculated scores, as well as some additional metrics and information, from four single cell RNA-seq datasets produced and made publicly available by 10x Genomics:</p>
+<a href="#identifying-empty-droplets" class="anchor"></a>Identifying empty droplets</h2>
+<p>Once the nuclear fraction score has been calculated for each cell barcode it can be used, in combination with the total UMI counts, to help identify empty droplets and then damaged cells using the <code>identify_empty_drops</code> and <code>identify_damaged_cells</code> functions sequentially.</p>
+<p>We provide some pre-calculated nuclear fraction scores, as well as additional metrics, from four single cell RNA-seq datasets produced and made publicly available by 10x Genomics:</p>
 <ol style="list-style-type: decimal">
 <li><p>Mouse E18 Combined Cortex, Hippocampus and Subventricular Zone Cells, ~10k cells <a href="https://support.10xgenomics.com/single-cell-gene-expression/datasets/4.0.0/SC3_v3_NextGem_DI_Neuron_10K" title="dataset link">dataset link</a></p></li>
 <li><p>Human Glioblastoma Multiforme, ~5k cells <a href="https://support.10xgenomics.com/single-cell-gene-expression/datasets/4.0.0/Parent_SC3v3_Human_Glioblastoma" title="dataset link">dataset link</a></p></li>
 <li><p>PBMCs from a Healthy Donor, ~10k cells <a href="https://support.10xgenomics.com/single-cell-gene-expression/datasets/4.0.0/Parent_NGSC3_DI_PBMC" title="dataset link">dataset link</a></p></li>
 <li><p>Hodgkin’s Lymphoma, Dissociated Tumour, ~5k cells <a href="https://support.10xgenomics.com/single-cell-gene-expression/datasets/4.0.0/Parent_NGSC3_DI_HodgkinsLymphoma" title="dataset link">dataset link</a></p></li>
 </ol>
-<p>Each dataset has been pre-filtered using <code><a href="https://rdrr.io/pkg/DropletUtils/man/emptyDrops.html">DropletUtils::emptyDrops</a></code> and a 15% mitochondrial gene content cutoff.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<p>Each dataset has been pre-filtered using <code><a href="https://rdrr.io/pkg/DropletUtils/man/emptyDrops.html">DropletUtils::emptyDrops</a></code> and a 15% mitochondrial gene content cutoff. The data can be loaded with <code><a href="https://rdrr.io/r/utils/data.html">data("qc_examples")</a></code>.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="st">"qc_examples"</span><span class="op">)</span>
 
-<span class="co"># What does the dataset contain?</span>
+<span class="co"># Quick look at the data</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">qc_examples</span><span class="op">)</span></code></pre></div>
 <pre><code>##                    sample       cell_barcode    umap_1     umap_2
 ## AAACCCAAGGCGATAC-1    GBM AAACCCAAGGCGATAC-1 -7.221113 -16.802812
@@ -211,41 +229,86 @@
 ## AAACCCACAGATGCGA-1                 0.3429289 cell
 ## AAACCCACAGGTGAGT-1                 0.3589220 cell
 ## AAACCCAGTCTTGCGG-1                 0.3823998 cell</code></pre>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># How many cells in each dataset</span>
 <span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">qc_examples</span><span class="op">$</span><span class="va">sample</span><span class="op">)</span></code></pre></div>
 <pre><code>## 
 ##  GBM   HL   MB PBMC 
 ## 5516 2734 9658 9689</code></pre>
 <p>We can look at the distribution of nuclear fraction scores directly:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://patchwork.data-imaginist.com">patchwork</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
 <span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">qc_examples</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">nuclear_fraction_droplet_qc</span><span class="op">)</span><span class="op">)</span>
 <span class="va">p</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_density.html">geom_density</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">sample</span><span class="op">)</span></code></pre></div>
 <p><img src="dropletQC_files/figure-html/density-plot-1.png" width="480"></p>
-<p>But it is often helpful to visualise the scores against the (log10) UMI count of each cell:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<p>But there is additional helpful information in total UMI count for each cell:</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">p</span> <span class="op">&lt;-</span> <span class="va">p</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>y<span class="op">=</span><span class="va">log10_umi_count</span><span class="op">)</span> <span class="op">+</span>
+   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>colour<span class="op">=</span><span class="va">flag</span><span class="op">)</span> <span class="op">+</span>
    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">sample</span><span class="op">)</span>
 <span class="va">p</span></code></pre></div>
 <p><img src="dropletQC_files/figure-html/against-umi-1.png" width="480"></p>
-<p>Intuitively, empty droplets and damaged cells have a lower RNA content. We can see this more easily if we colour the cells by our classifications, saved in the ‘flag’ column:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">p</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>colour<span class="op">=</span><span class="va">flag</span><span class="op">)</span></code></pre></div>
-<p><img src="dropletQC_files/figure-html/against-umi-labelled-1.png" width="624"></p>
-<p>Droplets containing only ambient RNA will have a low nuclear fraction score, while damaged cells will tend to have a higher score. If your sample contains heterogeneous cell populations, it is recommended to assess these plots separately for each cell type. Your QC metrics are unlikley to be completely independent of the biology of your cells. For example, some cell types or states will naturally have a lower RNA content and may appear as outliers if not analysed separately. To illustrate this point we’ll have a quick look at the glioblastoma dataset, where a rough cell type annotation has already been performed:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Get the data for the glioblastoma example</span>
-<span class="va">gbm</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">qc_examples</span>, <span class="va">sample</span> <span class="op">==</span> <span class="st">"GBM"</span><span class="op">)</span>
+<p>Intuitively, empty droplets have a low RNA content and low nuclear fraction score (bottom left). Damaged cells have a low RNA content and high nuclear fraction score (bottom right).</p>
+<p>To identify empty droplets the <code>identify_empty_drops</code> function should be used first:</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># Get data frame with the nuclear fraction in the first column and umi counts in</span>
+<span class="co"># the second</span>
+<span class="va">gbm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">qc_examples</span>, <span class="va">sample</span><span class="op">==</span><span class="st">"GBM"</span><span class="op">)</span>
+<span class="va">gbm.nf.umi</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>nf<span class="op">=</span><span class="va">gbm</span><span class="op">$</span><span class="va">nuclear_fraction_droplet_qc</span>,
+                         umi<span class="op">=</span><span class="va">gbm</span><span class="op">$</span><span class="va">umi_count</span><span class="op">)</span>
+
+<span class="co"># Run identify_empty_drops</span>
+<span class="va">gbm.ed</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/identify_empty_drops.html">identify_empty_drops</a></span><span class="op">(</span>nf_umi<span class="op">=</span><span class="va">gbm.nf.umi</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">gbm.ed</span><span class="op">)</span></code></pre></div>
+<pre><code>##          nf   umi cell_status
+## 1 0.1947243  2226        cell
+## 2 0.2766798  1063        cell
+## 3 0.1843824 17883        cell
+## 4 0.2919902  8172        cell
+## 5 0.3295617  9057        cell
+## 6 0.3795893  5612        cell</code></pre>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">gbm.ed</span><span class="op">$</span><span class="va">cell_status</span><span class="op">)</span></code></pre></div>
+<pre><code>## 
+##          cell empty_droplet 
+##          5296           220</code></pre>
+<p>This function tries to identify the population of empty droplets, but can fail if the population is very small or there are none. To check if the population of empty droplets has been identified correctly it can be instructive to visualise where the cut-off has been drawn:</p>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">gbm.ed</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/identify_empty_drops.html">identify_empty_drops</a></span><span class="op">(</span>nf_umi<span class="op">=</span><span class="va">gbm.nf.umi</span>, include_plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<p><img src="dropletQC_files/figure-html/plot-empty-drops-1.png" width="672"> The top two plots illustrate the density estimate and its derivative, which is used to try and identify the “peak” in low-nuclear-fraction-score droplets. The <code>identify_empty_drops</code> function also includes two “rescue parameters”; <code>nf_rescue</code> and <code>umi_rescue</code> which can be adjusted if you think cells are being misidentified as empty droplets. Barcodes with a nuclear fraction score above <code>nf_rescue</code> (defualt 0.05) and UMI count above above <code>umi_rescue</code> (default 1000) are rescued from being marked as empty droplets:</p>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">gbm.ed</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/identify_empty_drops.html">identify_empty_drops</a></span><span class="op">(</span>nf_umi<span class="op">=</span><span class="va">gbm.nf.umi</span>,
+                               nf_rescue <span class="op">=</span> <span class="fl">0.02</span>,umi_rescue <span class="op">=</span> <span class="fl">1000</span>,
+                               include_plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<p><img src="dropletQC_files/figure-html/empty-drops-rescue-paramters-1.png" width="672"></p>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">gbm.ed</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/identify_empty_drops.html">identify_empty_drops</a></span><span class="op">(</span>nf_umi<span class="op">=</span><span class="va">gbm.nf.umi</span>,
+                               nf_rescue <span class="op">=</span> <span class="fl">0.0</span>,umi_rescue <span class="op">=</span> <span class="fl">1000</span>,
+                               include_plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<p><img src="dropletQC_files/figure-html/empty-drops-rescue-paramters-2.png" width="672"></p>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">gbm.ed</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/identify_empty_drops.html">identify_empty_drops</a></span><span class="op">(</span>nf_umi<span class="op">=</span><span class="va">gbm.nf.umi</span>,
+                               nf_rescue <span class="op">=</span> <span class="fl">0.0</span>,umi_rescue <span class="op">=</span> <span class="fl">10000</span>,
+                               include_plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<p><img src="dropletQC_files/figure-html/empty-drops-rescue-paramters-3.png" width="672"> The dashed blue lines in the bottom plot mark the positions of the two rescue parameters and which barcodes are called as cells and empty droplets.</p>
+</div>
+<div id="identifying-damaged-cells" class="section level2">
+<h2 class="hasAnchor">
+<a href="#identifying-damaged-cells" class="anchor"></a>Identifying damaged cells</h2>
+<p>After running <code>identify_empty_drops</code>, <code>identify_damaged_cells</code> can be run. While <code>identify_empty_drops</code> can be run using all barcodes, if a sample contains a heterogeneous cell population it’s recommended to check for damaged cells <em>after</em> annotating cell types.</p>
+<p>The nuclear fraction and UMI count are unlikley to be completely independent of the biology of your cells. As an example we take a quick look at the glioblastoma dataset, where cell types have already been annotated:</p>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># Plot glioblasotma sample cell types</span>
 <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">gbm</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">umap_1</span>, y <span class="op">=</span> <span class="va">umap_2</span>, colour <span class="op">=</span> <span class="va">cell_type</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span><span class="op">(</span><span class="op">~</span> <span class="va">sample</span><span class="op">)</span></code></pre></div>
 <p><img src="dropletQC_files/figure-html/gbm-umap-1.png" width="624"></p>
-<p>Now we look at both the number of UMIs and the nuclear fraction score, split by cell type:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<p>Both the number of UMIs and the nuclear fraction score can be split by cell type:</p>
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">p1</span> <span class="op">&lt;-</span>
    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">gbm</span>,
           <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">nuclear_fraction_droplet_qc</span>, group <span class="op">=</span> <span class="va">cell_type</span>, fill <span class="op">=</span> <span class="va">cell_type</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
@@ -256,58 +319,85 @@
    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_density.html">geom_density</a></span><span class="op">(</span>adjust <span class="op">=</span> <span class="fl">1.5</span>, alpha <span class="op">=</span> <span class="fl">.4</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span><span class="op">(</span><span class="st">"log10(UMI count)"</span><span class="op">)</span>
 <span class="va">p1</span></code></pre></div>
 <p><img src="dropletQC_files/figure-html/qc-metrics-celltype-1.png" width="624"></p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">p2</span></code></pre></div>
 <p><img src="dropletQC_files/figure-html/qc-metrics-celltype-2.png" width="624"></p>
-<p>The nuclear fraction scores are approximately normally distributed for each cell type. A value of +/- three standard deviations from the mean is a reasonable, if conservative, starting point for assigning thresholds. Here is an example of applying thresholds to the glioblastoma dataset:</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Define nuclear fraction thresholds</span>
-<span class="va">thresholds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tribble.html">tribble</a></span><span class="op">(</span>
-   <span class="op">~</span><span class="va">cell_type</span>,  <span class="op">~</span><span class="va">lower</span>,  <span class="op">~</span><span class="va">upper</span>,
-   <span class="st">"endothelial"</span>, <span class="fl">0.05</span>, <span class="fl">0.49</span>,
-   <span class="st">"malignant"</span>, <span class="fl">0.05</span>, <span class="fl">0.59</span>,
-   <span class="st">"myeloid"</span>, <span class="fl">0.06</span>, <span class="fl">0.56</span>,
-   <span class="st">"oligodendrocyte"</span>, <span class="fl">0.09</span>, <span class="fl">0.78</span>,
-   <span class="st">"t_cell"</span>, <span class="fl">0.12</span>, <span class="fl">0.67</span><span class="op">)</span>
-
-<span class="co"># Plot thresholds</span>
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">gbm</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">nuclear_fraction_droplet_qc</span>, y<span class="op">=</span><span class="va">log10_umi_count</span>, colour<span class="op">=</span><span class="va">flag</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>legend.title<span class="op">=</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">cell_type</span><span class="op">)</span><span class="op">+</span>
-   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_vline</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">thresholds</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>xintercept <span class="op">=</span> <span class="va">lower</span><span class="op">)</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span><span class="op">)</span> <span class="op">+</span>
-   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_vline</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">thresholds</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>xintercept <span class="op">=</span> <span class="va">upper</span><span class="op">)</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span><span class="op">)</span></code></pre></div>
-<p><img src="dropletQC_files/figure-html/apply-thresholds-1.png" width="720"> Using a combination of metrics, such as mitchondrial gene content, number of UMIs and the nuclear fraction score can often be helpful.</p>
-<p>It will usually be desirable to exclude empty droplets from your dataset. However, depending on the nature of your sample and your biological question, damaged cells may still retain plenty of useful information. In that case you may want to just mark these cells, keeping the metadata at hand throughout downstream analyses.</p>
-<p>It’s difficult to provide guidance on where to place thresholds that will be applicable in every circumstance. However, before deciding to exclude a population of cells we recommend pausing to consider whether the data are consistent with your expectations and knowledge of the biology of each cell type in your sample:</p>
-<ul>
-<li><p>Does it make sense that a cluster of large malignant cells has a very low RNA content, or are they more likely to represent empty droplets?</p></li>
-<li><p>Should a cluster of t-cells which appears to be an outlier be excluded or do they just have a lower average RNA content?</p></li>
-<li><p>Do the sensitive cell types in a brain sample, astrocytes and neurons, represent the majority of damaged cells?</p></li>
-</ul>
-<p>Thinking through questions like these will be more fruitful than blindly following rules of thumb that may be inappropriate for your dataset or research question.</p>
+<p>Different cell types show different distributions for both the UMI count and nuclear fraction. When we run <code>identify_damaged_cells</code> we’re looking for a population of cells with high nuclear fraction score and low RNA content - bottom right in the nuclear fraction vs. UMI count plot. The input to <code>identify_damaged_cells</code> should be the three-column data frame output by <code>identify_empty_drops</code> plus an additional column with cell type info:</p>
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">gbm.ed</span><span class="op">$</span><span class="va">cell_type</span> <span class="op">&lt;-</span> <span class="va">gbm</span><span class="op">$</span><span class="va">cell_type</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">gbm.ed</span><span class="op">)</span></code></pre></div>
+<pre><code>##          nf   umi cell_status       cell_type
+## 1 0.1947243  2226        cell          t_cell
+## 2 0.2766798  1063        cell         myeloid
+## 3 0.1843824 17883        cell       malignant
+## 4 0.2919902  8172        cell         myeloid
+## 5 0.3295617  9057        cell oligodendrocyte
+## 6 0.3795893  5612        cell       malignant</code></pre>
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">gbm.ed</span><span class="op">$</span><span class="va">cell_status</span><span class="op">)</span></code></pre></div>
+<pre><code>## 
+##          cell empty_droplet 
+##          5299           217</code></pre>
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># Identify damaged cells</span>
+<span class="va">gbm.ed.dc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/identify_damaged_cells.html">identify_damaged_cells</a></span><span class="op">(</span><span class="va">gbm.ed</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span>, output_plots <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<p>A list of length two is returned, containing; the original data frame with damaged cells marked:</p>
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">gbm.ed.dc</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></code></pre></div>
+<pre><code>##          nf   umi  cell_status       cell_type
+## 1 0.1947243  2226         cell          t_cell
+## 2 0.2766798  1063         cell         myeloid
+## 3 0.1843824 17883         cell       malignant
+## 4 0.2919902  8172         cell         myeloid
+## 5 0.3295617  9057         cell oligodendrocyte
+## 6 0.3795893  5612 damaged_cell       malignant</code></pre>
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">gbm.ed.dc</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">cell_status</span><span class="op">)</span></code></pre></div>
+<pre><code>## 
+##          cell  damaged_cell empty_droplet 
+##          4760           539           217</code></pre>
+<p>and a named list of plots for each cell type:</p>
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html">wrap_plots</a></span><span class="op">(</span><span class="va">gbm.ed.dc</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>, nrow <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></code></pre></div>
+<p><img src="dropletQC_files/figure-html/plot-damaged-cells-1.png" width="1152"> For each provided cell type the left plot marks barcodes called as cells or damaged cells - excluding any empty droplets. The remaining plots illustrate the Guassian distribution/s fit to the nculear fraction (centre) and log10(UMI count) (right) using expectation maximisation. Similar to the <code>identify_empty_drops</code> function, the <code>identify_damaged_cells</code> function inlcudes two rescue parameters; <code>nf_sep</code> and <code>umi_sep_perc</code>. For a population of barcodes to be called as damaged cells:</p>
+<ol style="list-style-type: decimal">
+<li><p>The mean of the distribution fit to the nuclear fraction (vertical solid red line) must be at least <code>nf_sep</code> (default 0.15) <em>greater</em> than the mean of the cell population - the threshold marked by the dashed blue line</p></li>
+<li><p>The mean of the distribution fit to the log10(UMI counts) (vertical solid red line) must be at least <code>umi_sep_perc</code> (default 50%) percent <em>less</em> than the mean of the cell population - threshold indicated by the dashed blue line</p></li>
+</ol>
+<p>The ability to detect damaged cells will depend on the the accuracy of the cell type annotation. Different cell types or states can contain varying amounts of nuclear or total RNA, and may cause mixed populations of cells to be mislabeled as damaged.</p>
 </div>
-<div id="gene-level-counts" class="section level2">
+<div id="additional-info" class="section level2">
 <h2 class="hasAnchor">
-<a href="#gene-level-counts" class="anchor"></a>Gene-level counts</h2>
-<p>Note that if you have run a counting pipeline, such as <a href="http://velocyto.org/">velocyto</a> to quantify spliced and unspliced counts, you already have the information you need to calculate the nuclear fraction. If for example you have run <code>velocyto run10x</code> you could use the following:</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scanpy <span class="im">as</span> sc</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Import loom file</span></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>adata <span class="op">=</span> sc.read_loom(<span class="st">"velocyto.loom"</span>)</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate the nuclear fraction using the spliced and unspliced matrices</span></span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>exon_sum <span class="op">=</span> adata.layers[<span class="st">'spliced'</span>].<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>intron_sum <span class="op">=</span> adata.layers[<span class="st">'unspliced'</span>].<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>nuclear_fraction <span class="op">=</span> intron_sum<span class="op">/</span>(exon_sum <span class="op">+</span> intron_sum)</span></code></pre></div>
-<p>Counting pipelines like these are much more powerful, as they provide spliced and unspliced counts <strong>per gene</strong> as well as per cell barcode. This additional information allows you to perform further analyses, such as RNA velocity, that can take advantage of this additional information. The trade-off here is time - <code><a href="../reference/nuclear_fraction_tags.html">dropletQC::nuclear_fraction_tags</a></code> ignores UMIs and gene-level information in order to calculate the nuclear fraction score quickly. Here is a comparison of the nuclear fraction scores calculated with <code>dropletQC::nuclear_fraction</code> <em>vs</em> the output from <code>velocyto</code>:</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<a href="#additional-info" class="anchor"></a>Additional info</h2>
+</div>
+</div>
+<div id="excluding-cells" class="section level1">
+<h1 class="hasAnchor">
+<a href="#excluding-cells" class="anchor"></a>Excluding cells</h1>
+<p>The <code>identify_empty_drops</code> and <code>identify_damaged_cells</code> functions mark provided barcodes as either; “empty_droplet”, “damaged_cell” or “cell”.</p>
+<p>It will often be desirable to exclude empty droplets from further analysis, but care should be taken that cell populations of interest with low nuclear fraction scores are not accidentally excluded. Clustering and visualisation combined with a knowledge of the cell types in your sample and relevant marker genes should help avoid this.</p>
+<p>Depending on the nature of your sample and biological question, populations of damaged cells may be critical to retain. In these cases, keeping cell labels as metadata throughout downstream analyses can assist in distinguishing the biological variation of interest from technical factors such as input sample quality.</p>
+</div>
+<div id="gene-level-counts" class="section level1">
+<h1 class="hasAnchor">
+<a href="#gene-level-counts" class="anchor"></a>Gene-level counts</h1>
+<p>If you used a tool such as <a href="http://velocyto.org/">velocyto</a> to quantify spliced and unspliced counts, you already have the information you need to calculate the nuclear fraction. If for example you have run <code>velocyto run10x</code> you could use the following:</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scanpy <span class="im">as</span> sc</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Import loom file</span></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>adata <span class="op">=</span> sc.read_loom(<span class="st">"velocyto.loom"</span>)</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate the nuclear fraction using the spliced and unspliced matrices</span></span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>exon_sum <span class="op">=</span> adata.layers[<span class="st">'spliced'</span>].<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>intron_sum <span class="op">=</span> adata.layers[<span class="st">'unspliced'</span>].<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>nuclear_fraction <span class="op">=</span> intron_sum<span class="op">/</span>(exon_sum <span class="op">+</span> intron_sum)</span></code></pre></div>
+<p>Counting pipelines like these are much more powerful, as they provide spliced and unspliced counts <strong>per gene</strong> as well as per cell barcode. This additional information allows further analyses, such as RNA velocity, that can take advantage of this additional gene-level information. Here is a comparison of the nuclear fraction scores calculated with <code>dropletQC::nuclear_fraction</code> <em>vs</em> the output from <code>velocyto</code>:</p>
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">qc_examples</span>,
        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">nuclear_fraction_droplet_qc</span>, y <span class="op">=</span> <span class="va">nuclear_fraction_velocyto</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span><span class="op">(</span> <span class="op">~</span> <span class="va">sample</span><span class="op">)</span></code></pre></div>
 <p><img src="dropletQC_files/figure-html/velocyto-dropletqc-comparison-1.png" width="480"></p>
-<p>As always, your choice of tool will depend on what you are trying to do. If you just want to calculate a nuclear fraction score for QC, this package should be sufficient. If you’re interested in looking at gene expression dynamics, a more sophisticated tool like <code>velocyto</code> will be required.</p>
 </div>
   </div>
 
