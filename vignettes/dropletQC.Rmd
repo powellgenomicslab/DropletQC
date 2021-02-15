@@ -7,11 +7,11 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-## Calculating the nuclear fraction score
+# Calculating the nuclear fraction score
 
 To calculate the nuclear fraction score for each provided cell barcode, you can use either the `nuclear_fraction_tags` or `nuclear_fraction_annotation` function. If your BAM file contains region tags which mark each read as exonic/intronic, such as the barcoded BAM files output by 10x Genomics' Cell Ranger, then use the `nuclear_fraction_tags` function.
 
-# Using BAM region tags
+## Using BAM region tags
 In Cell Ranger BAM files, the 'CB' tag defines the error-corrected cell barcode sequence and 'RE' is one of three single characters representing the region type of the read; E (exonic), N (intronic) or I (intergenic). 'CB' and 'RE' are used by default, but you can change these depending on the tags used in your BAM file, using the `cell_barcode_tag` and `region_type_tag` arguments. Internally, `nuclear_fraction_tags` parses the BAM file tags with `Rsamtools::scanBam`:
 
 ```{r inner-workings, message=FALSE, warning=FALSE}
@@ -74,7 +74,7 @@ nf2
 
 Note that here we have provided a vector of requested barcode IDs to the barcodes argument rather than the path to a file on disk 'barcodes.tsv.gz'. Either is fine, but the format of the barcodes must match the BAM file.
 
-# Using a gene annotation
+## Using a gene annotation
 
 If your BAM file doesn't contain region tags you can use the `nuclear_fraction_annotation` function and provide a gene annotation file. Each read in the BAM file will be assessed for overlap with exon and intron ranges extracted from the provided annotation. The genome build and chromosome names in the annotation should match the BAM file.
 
@@ -86,7 +86,7 @@ nf3 <- nuclear_fraction_annotation(annotation_path = system.file("extdata/outs/c
 head(nf3)
 ```
 
-## Identifying empty droplets
+# Identifying empty droplets
 
 Once the nuclear fraction score has been calculated for each cell barcode it can be used, in combination with the total UMI counts, to help identify empty droplets and then damaged cells using the `identify_empty_drops` and `identify_damaged_cells` functions sequentially.
 
@@ -170,7 +170,7 @@ gbm.ed <- identify_empty_drops(nf_umi=gbm.nf.umi,
 The dashed blue lines in the bottom plot mark the positions of the two rescue parameters and which barcodes are called as cells and empty droplets.
 
 
-## Identifying damaged cells
+# Identifying damaged cells
 
 After running `identify_empty_drops`, `identify_damaged_cells` can be run. While `identify_empty_drops` can be run using all barcodes, if a sample contains a heterogeneous cell population it's recommended to check for damaged cells *after* annotating cell types.
 
@@ -224,16 +224,16 @@ For each provided cell type the left plot marks barcodes called as cells or dama
 
 The ability to detect damaged cells will depend on the the accuracy of the cell type annotation. Different cell types or states can contain varying amounts of nuclear or total RNA, and may cause mixed populations of cells to be mislabeled as damaged.
 
-## Additional info
+# Additional info
 
-# Excluding cells
+## Excluding cells
 The `identify_empty_drops` and `identify_damaged_cells` functions mark provided barcodes as either; "empty_droplet", "damaged_cell" or "cell". 
 
 It will often be  desirable to exclude empty droplets from further analysis, but care should be taken that cell populations of interest with low nuclear fraction scores are not accidentally excluded. Clustering and visualisation combined with a knowledge of the cell types in your sample and relevant marker genes should help avoid this. 
 
 Depending on the nature of your sample and biological question, populations of damaged cells may be critical to retain. In these cases, keeping cell labels as metadata throughout downstream analyses can assist in distinguishing the biological variation of interest from technical factors such as input sample quality.
 
-# Gene-level counts
+## Gene-level counts
 If you used a tool such as [velocyto](http://velocyto.org/) to quantify spliced and unspliced counts, you already have the information you need to calculate the nuclear fraction. If for example you have run `velocyto run10x` you could use the following:
 ```{python, python.reticulate = FALSE, eval=FALSE}
 import scanpy as sc

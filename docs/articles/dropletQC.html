@@ -80,14 +80,13 @@
 
     
     
-<div id="calculating-the-nuclear-fraction-score" class="section level2">
-<h2 class="hasAnchor">
-<a href="#calculating-the-nuclear-fraction-score" class="anchor"></a>Calculating the nuclear fraction score</h2>
-<p>To calculate the nuclear fraction score for each provided cell barcode, you can use either the <code>nuclear_fraction_tags</code> or <code>nuclear_fraction_annotation</code> function. If your BAM file contains region tags which mark each read as exonic/intronic, such as the barcoded BAM files output by 10x Genomics’ Cell Ranger, then use the <code>nuclear_fraction_tags</code> function.</p>
-</div>
-<div id="using-bam-region-tags" class="section level1">
+<div id="calculating-the-nuclear-fraction-score" class="section level1">
 <h1 class="hasAnchor">
-<a href="#using-bam-region-tags" class="anchor"></a>Using BAM region tags</h1>
+<a href="#calculating-the-nuclear-fraction-score" class="anchor"></a>Calculating the nuclear fraction score</h1>
+<p>To calculate the nuclear fraction score for each provided cell barcode, you can use either the <code>nuclear_fraction_tags</code> or <code>nuclear_fraction_annotation</code> function. If your BAM file contains region tags which mark each read as exonic/intronic, such as the barcoded BAM files output by 10x Genomics’ Cell Ranger, then use the <code>nuclear_fraction_tags</code> function.</p>
+<div id="using-bam-region-tags" class="section level2">
+<h2 class="hasAnchor">
+<a href="#using-bam-region-tags" class="anchor"></a>Using BAM region tags</h2>
 <p>In Cell Ranger BAM files, the ‘CB’ tag defines the error-corrected cell barcode sequence and ‘RE’ is one of three single characters representing the region type of the read; E (exonic), N (intronic) or I (intergenic). ‘CB’ and ‘RE’ are used by default, but you can change these depending on the tags used in your BAM file, using the <code>cell_barcode_tag</code> and <code>region_type_tag</code> arguments. Internally, <code>nuclear_fraction_tags</code> parses the BAM file tags with <code><a href="https://rdrr.io/pkg/Rsamtools/man/scanBam.html">Rsamtools::scanBam</a></code>:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://bioconductor.org/packages/Rsamtools">Rsamtools</a></span><span class="op">)</span>
@@ -160,9 +159,9 @@
 ## AAACACGTTCTCATCG-1        0.0000000</code></pre>
 <p>Note that here we have provided a vector of requested barcode IDs to the barcodes argument rather than the path to a file on disk ‘barcodes.tsv.gz’. Either is fine, but the format of the barcodes must match the BAM file.</p>
 </div>
-<div id="using-a-gene-annotation" class="section level1">
-<h1 class="hasAnchor">
-<a href="#using-a-gene-annotation" class="anchor"></a>Using a gene annotation</h1>
+<div id="using-a-gene-annotation" class="section level2">
+<h2 class="hasAnchor">
+<a href="#using-a-gene-annotation" class="anchor"></a>Using a gene annotation</h2>
 <p>If your BAM file doesn’t contain region tags you can use the <code>nuclear_fraction_annotation</code> function and provide a gene annotation file. Each read in the BAM file will be assessed for overlap with exon and intron ranges extracted from the provided annotation. The genome build and chromosome names in the annotation should match the BAM file.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">nf3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nuclear_fraction_annotation.html">nuclear_fraction_annotation</a></span><span class="op">(</span>annotation_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata/outs/chr1.gff3"</span>,  package <span class="op">=</span> <span class="st">"dropletQC"</span><span class="op">)</span>,
@@ -177,9 +176,11 @@
 ## AACGACTTCAATATGT-1        0.4004525
 ## AACGGCGTCATCTGGA-1        0.8845109
 ## AAGCAGGGGTCGCGAA-1        0.3929376</code></pre>
-<div id="identifying-empty-droplets" class="section level2">
-<h2 class="hasAnchor">
-<a href="#identifying-empty-droplets" class="anchor"></a>Identifying empty droplets</h2>
+</div>
+</div>
+<div id="identifying-empty-droplets" class="section level1">
+<h1 class="hasAnchor">
+<a href="#identifying-empty-droplets" class="anchor"></a>Identifying empty droplets</h1>
 <p>Once the nuclear fraction score has been calculated for each cell barcode it can be used, in combination with the total UMI counts, to help identify empty droplets and then damaged cells using the <code>identify_empty_drops</code> and <code>identify_damaged_cells</code> functions sequentially.</p>
 <p>We provide some pre-calculated nuclear fraction scores, as well as additional metrics, from four single cell RNA-seq datasets produced and made publicly available by 10x Genomics:</p>
 <ol style="list-style-type: decimal">
@@ -296,9 +297,9 @@
                                include_plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p><img src="dropletQC_files/figure-html/empty-drops-rescue-paramters-3.png" width="672"> The dashed blue lines in the bottom plot mark the positions of the two rescue parameters and which barcodes are called as cells and empty droplets.</p>
 </div>
-<div id="identifying-damaged-cells" class="section level2">
-<h2 class="hasAnchor">
-<a href="#identifying-damaged-cells" class="anchor"></a>Identifying damaged cells</h2>
+<div id="identifying-damaged-cells" class="section level1">
+<h1 class="hasAnchor">
+<a href="#identifying-damaged-cells" class="anchor"></a>Identifying damaged cells</h1>
 <p>After running <code>identify_empty_drops</code>, <code>identify_damaged_cells</code> can be run. While <code>identify_empty_drops</code> can be run using all barcodes, if a sample contains a heterogeneous cell population it’s recommended to check for damaged cells <em>after</em> annotating cell types.</p>
 <p>The nuclear fraction and UMI count are unlikley to be completely independent of the biology of your cells. As an example we take a quick look at the glioblastoma dataset, where cell types have already been annotated:</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
@@ -366,21 +367,19 @@
 </ol>
 <p>The ability to detect damaged cells will depend on the the accuracy of the cell type annotation. Different cell types or states can contain varying amounts of nuclear or total RNA, and may cause mixed populations of cells to be mislabeled as damaged.</p>
 </div>
-<div id="additional-info" class="section level2">
-<h2 class="hasAnchor">
-<a href="#additional-info" class="anchor"></a>Additional info</h2>
-</div>
-</div>
-<div id="excluding-cells" class="section level1">
+<div id="additional-info" class="section level1">
 <h1 class="hasAnchor">
-<a href="#excluding-cells" class="anchor"></a>Excluding cells</h1>
+<a href="#additional-info" class="anchor"></a>Additional info</h1>
+<div id="excluding-cells" class="section level2">
+<h2 class="hasAnchor">
+<a href="#excluding-cells" class="anchor"></a>Excluding cells</h2>
 <p>The <code>identify_empty_drops</code> and <code>identify_damaged_cells</code> functions mark provided barcodes as either; “empty_droplet”, “damaged_cell” or “cell”.</p>
 <p>It will often be desirable to exclude empty droplets from further analysis, but care should be taken that cell populations of interest with low nuclear fraction scores are not accidentally excluded. Clustering and visualisation combined with a knowledge of the cell types in your sample and relevant marker genes should help avoid this.</p>
 <p>Depending on the nature of your sample and biological question, populations of damaged cells may be critical to retain. In these cases, keeping cell labels as metadata throughout downstream analyses can assist in distinguishing the biological variation of interest from technical factors such as input sample quality.</p>
 </div>
-<div id="gene-level-counts" class="section level1">
-<h1 class="hasAnchor">
-<a href="#gene-level-counts" class="anchor"></a>Gene-level counts</h1>
+<div id="gene-level-counts" class="section level2">
+<h2 class="hasAnchor">
+<a href="#gene-level-counts" class="anchor"></a>Gene-level counts</h2>
 <p>If you used a tool such as <a href="http://velocyto.org/">velocyto</a> to quantify spliced and unspliced counts, you already have the information you need to calculate the nuclear fraction. If for example you have run <code>velocyto run10x</code> you could use the following:</p>
 <div class="sourceCode" id="cb38"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scanpy <span class="im">as</span> sc</span>
 <span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -398,6 +397,7 @@
    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span><span class="op">(</span> <span class="op">~</span> <span class="va">sample</span><span class="op">)</span></code></pre></div>
 <p><img src="dropletQC_files/figure-html/velocyto-dropletqc-comparison-1.png" width="480"></p>
+</div>
 </div>
   </div>
 
