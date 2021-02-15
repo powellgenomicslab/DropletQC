@@ -7,9 +7,13 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+## Calculating the nuclear fraction score
 
-## How dropletQC works
-To calculate the nuclear fraction score for each provided cell barcode, we use the `nuclear_fraction_tags` function. This simply scans the 'CB' and 'RE' tags in the provided indexed Cell Ranger barcoded bam file. To access these tags it uses a strategy similar to this:
+To calculate the nuclear fraction score for each provided cell barcode, you can use either the `nuclear_fraction_tags` or `nuclear_fraction_annotation` function. If your BAM file contains region tags which mark each read as exonic/intronic, such as the barcoded BAM files output by 10x Genomics' Cell Ranger, then use the `nuclear_fraction_tags` function.
+
+# Using BAM region tags
+In Cell Ranger BAM files, the 'CB' tag defines the error-corrected cell barcode sequence and 'RE' is one of three single characters representing the region type of the read; E (exonic), N (intronic) or I (intergenic). 'CB' and 'RE' are used by default, but you can change these depending on the tags used in your BAM file, using the `cell_barcode_tag` and `region_type_tag` arguments. Internally, `nuclear_fraction_tags` parses the BAM file tags with `Rsamtools::scanBam`:
+
 ```{r inner-workings, message=FALSE, warning=FALSE}
 library(Rsamtools)
 library(GenomicRanges)
@@ -21,11 +25,11 @@ bam_file <-
 
 # Define some genomic intervals to pull data from
 intervals <- GRanges(seqnames = "chr1",
-                     ranges = IRanges(start = c(1, 1180, 4880),
-                                      end = c(10, 1190, 4890)))
+                     ranges = IRanges(start = c(5250, 5609),
+                                      end = c(5252, 5611)))
 
 # Pull CB and RE tags from the specified regions in the BAM file
-sapply(1:3, function(x)
+sapply(1:2, function(x)
    scanBam(bam_file,
            param = ScanBamParam(
               tag = c("CB", "RE"),
@@ -33,17 +37,15 @@ sapply(1:3, function(x)
            ))[[1]]$tag)
 ```
 
-'CB' is the error-corrected cell barcode sequence and 'RE' is one of three single characters representing the region type of the read; E (exonic), N (intronic) or I (intergenic). The nuclear fraction score that is returned by `nuclear_fraction_tags` is simply E/(E+N) for each provided cell barcode. To speed up the processing of the (usually large) BAM file, dropletQC splits the BAM file into a number of genomic tiles and processes them in parallel by internally calling `furrr::future_map`.
+The nuclear fraction score returned by `nuclear_fraction_tags` for a Cell Ranger BAM file would be E/(E+N) for each provided cell barcode. To speed up the processing of the (usually large) BAM file, dropletQC splits the file into a number of genomic tiles and processes them in parallel by internally calling `furrr::future_map`. By default, 100 tiles are used and `future::availableCores() - 1` cores.
 
-
-## Calculating the nuclear fraction score
-There are two ways to use `nuclear_fraction_tags`; point it to the Cell Ranger ‘outs’ directory or point it to the individual files. The simplest way is to rely on the consistent structure of the ‘outs’ directory produced by the Cell Ranger software:
+There are two main ways to call `nuclear_fraction_tags`. If you used Cell Ranger for alignment, you can point it to the Cell Ranger ‘outs’ directory.  This takes advantage of the consistent file names and structure of the ‘outs’:
 ```{r example1, message=FALSE, warning=FALSE}
 library(dropletQC)
 
 nf1 <- nuclear_fraction_tags(
    outs = system.file("extdata", "outs", package = "dropletQC"),
-   tiles = 10,
+   tiles = 1,
    cores = 1,
    verbose = FALSE
 )
@@ -54,28 +56,41 @@ list.files(system.file("extdata", "outs", package = "dropletQC"),
            recursive = TRUE)
 ```
 
-If you don’t have this directory structure, or your files have been renamed e.g. they were given to you by a collaborator, you can specify the paths to the required files directly:
+If you don’t have this directory structure, or your files have been renamed, you can specify paths to the required files directly:
 ```{r example2, message=FALSE, warning=FALSE}
 nf2 <- nuclear_fraction_tags(
-   bam = system.file("extdata", "outs", "possorted_genome_bam.bam", package =
-                        "dropletQC"),
+   bam = system.file("extdata", "outs", "possorted_genome_bam.bam", package ="dropletQC"),
    barcodes = c(
       "AAAAGTCACTTACTTG-1",
       "AAAAGTGGATCTCTAA-1",
       "AAACACGTTCTCATCG-1"
    ),
-   tiles = 10,
+   tiles = 1,
    cores = 1,
    verbose = FALSE
 )
 nf2
 ```
 
-Note that here we have provided a vector of requested barcode IDs to the barcodes argument rather than the path to a file on disk 'barcodes.tsv.gz'. Either is fine, just make sure the format of your barcodes matches the BAM file.
+Note that here we have provided a vector of requested barcode IDs to the barcodes argument rather than the path to a file on disk 'barcodes.tsv.gz'. Either is fine, but the format of the barcodes must match the BAM file.
 
+# Using a gene annotation
 
-## Assessing the nuclear fraction score
-Once you’ve calculated the nuclear fraction score you can use it to help identify damaged cells or empty droplets. We provide some pre-calculated scores, as well as some additional metrics and information, from four single cell RNA-seq datasets produced and made publicly available by 10x Genomics:
+If your BAM file doesn't contain region tags you can use the `nuclear_fraction_annotation` function and provide a gene annotation file. Each read in the BAM file will be assessed for overlap with exon and intron ranges extracted from the provided annotation. The genome build and chromosome names in the annotation should match the BAM file.
+
+```{r example3, message=FALSE, warning=FALSE}
+nf3 <- nuclear_fraction_annotation(annotation_path = system.file("extdata/outs/chr1.gff3",  package = "dropletQC"),
+                                   bam = system.file("extdata/outs/possorted_genome_bam.bam",  package = "dropletQC"),
+                                   barcodes = system.file( "extdata/outs/filtered_feature_bc_matrix/barcodes.tsv.gz",package = "dropletQC"),
+                                   tiles = 1, cores = 1, verbose = FALSE)
+head(nf3)
+```
+
+## Identifying empty droplets
+
+Once the nuclear fraction score has been calculated for each cell barcode it can be used, in combination with the total UMI counts, to help identify empty droplets and then damaged cells using the `identify_empty_drops` and `identify_damaged_cells` functions sequentially.
+
+We provide some pre-calculated nuclear fraction scores, as well as additional metrics, from four single cell RNA-seq datasets produced and made publicly available by 10x Genomics:
 
 1. Mouse E18 Combined Cortex, Hippocampus and Subventricular Zone Cells, ~10k cells [dataset link](https://support.10xgenomics.com/single-cell-gene-expression/datasets/4.0.0/SC3_v3_NextGem_DI_Neuron_10K "dataset link")
 
@@ -85,12 +100,12 @@ Once you’ve calculated the nuclear fraction score you can use it to help ident
 
 4. Hodgkin's Lymphoma, Dissociated Tumour, ~5k cells [dataset link](https://support.10xgenomics.com/single-cell-gene-expression/datasets/4.0.0/Parent_NGSC3_DI_HodgkinsLymphoma "dataset link")
 
-Each dataset has been pre-filtered using `DropletUtils::emptyDrops` and a 15% mitochondrial gene content cutoff.
+Each dataset has been pre-filtered using `DropletUtils::emptyDrops` and a 15% mitochondrial gene content cutoff. The data can be loaded with `data("qc_examples")`.
 
 ```{r example-dataset}
 data("qc_examples")
 
-# What does the dataset contain?
+# Quick look at the data
 head(qc_examples)
 
 # How many cells in each dataset
@@ -100,36 +115,74 @@ table(qc_examples$sample)
 We can look at the distribution of nuclear fraction scores directly:
 ```{r density-plot, fig.width=5, fig.height=5, warning=FALSE, message=FALSE}
 library(ggplot2)
+library(patchwork)
 library(dplyr)
 p <- ggplot(qc_examples, aes(x=nuclear_fraction_droplet_qc))
 p + geom_density() +
    facet_wrap(~sample)
 ```
 
-But it is often helpful to visualise the scores against the (log10) UMI count of each cell:
+But there is additional helpful information in total UMI count for each cell:
 
 ```{r against-umi, fig.width=5, fig.height=5}
 p <- p + aes(y=log10_umi_count) +
+   aes(colour=flag) +
    geom_point() +
    facet_wrap(~sample)
 p
 ```
 
-Intuitively, empty droplets and damaged cells have a lower RNA content. We can see this more easily if we colour the cells by our classifications, saved in the 'flag' column:
-```{r against-umi-labelled, fig.width=6.5, fig.height=5}
-p + aes(colour=flag)
+Intuitively, empty droplets have a low RNA content and low nuclear fraction score (bottom left). Damaged cells have a low RNA content and high nuclear fraction score (bottom right).
+
+To identify empty droplets the `identify_empty_drops` function should be used first:
+
+```{r identidy-empty-drops, message=FALSE, warning=FALSE}
+# Get data frame with the nuclear fraction in the first column and umi counts in
+# the second
+gbm <- filter(qc_examples, sample=="GBM")
+gbm.nf.umi <- data.frame(nf=gbm$nuclear_fraction_droplet_qc,
+                         umi=gbm$umi_count)
+
+# Run identify_empty_drops
+gbm.ed <- identify_empty_drops(nf_umi=gbm.nf.umi)
+head(gbm.ed)
+table(gbm.ed$cell_status)
 ```
 
-Droplets containing only ambient RNA will have a low nuclear fraction score, while damaged cells will tend to have a higher score. If your sample contains heterogeneous cell populations, it is recommended to assess these plots separately for each cell type. Your QC metrics are unlikley to be completely independent of the biology of your cells. For example, some cell types or states will naturally have a lower RNA content and may appear as outliers if not analysed separately. To illustrate this point we'll have a quick look at the glioblastoma dataset, where a rough cell type annotation has already been performed:
+This function tries to identify the population of empty droplets, but can fail if the population is very small or there are none. To check if the population of empty droplets has been identified correctly it can be instructive to visualise where the cut-off has been drawn:
+
+```{r plot-empty-drops, fig.width=7, fig.height=5}
+gbm.ed <- identify_empty_drops(nf_umi=gbm.nf.umi, include_plot = TRUE)
+```
+The top two plots illustrate the density estimate and its derivative, which is used to try and identify the "peak" in low-nuclear-fraction-score droplets. The `identify_empty_drops` function also includes two "rescue parameters"; `nf_rescue` and `umi_rescue` which can be adjusted if you think cells are being misidentified as empty droplets. Barcodes with a nuclear fraction score above `nf_rescue` (defualt 0.05) and UMI count above above `umi_rescue` (default 1000) are rescued from being marked as empty droplets:
+
+```{r empty-drops-rescue-paramters, fig.width=7, fig.height=5}
+gbm.ed <- identify_empty_drops(nf_umi=gbm.nf.umi,
+                               nf_rescue = 0.02,umi_rescue = 1000,
+                               include_plot = TRUE)
+gbm.ed <- identify_empty_drops(nf_umi=gbm.nf.umi,
+                               nf_rescue = 0.0,umi_rescue = 1000,
+                               include_plot = TRUE)
+gbm.ed <- identify_empty_drops(nf_umi=gbm.nf.umi,
+                               nf_rescue = 0.0,umi_rescue = 10000,
+                               include_plot = TRUE)
+```
+The dashed blue lines in the bottom plot mark the positions of the two rescue parameters and which barcodes are called as cells and empty droplets.
+
+
+## Identifying damaged cells
+
+After running `identify_empty_drops`, `identify_damaged_cells` can be run. While `identify_empty_drops` can be run using all barcodes, if a sample contains a heterogeneous cell population it's recommended to check for damaged cells *after* annotating cell types.
+
+The nuclear fraction and UMI count are unlikley to be completely independent of the biology of your cells. As an example we take a quick look at the glioblastoma dataset, where cell types have already been annotated:
 ```{r gbm-umap, fig.width=6.5, fig.height=5}
-# Get the data for the glioblastoma example
-gbm <- dplyr::filter(qc_examples, sample == "GBM")
+# Plot glioblasotma sample cell types
 ggplot(gbm, aes(x = umap_1, y = umap_2, colour = cell_type)) +
    geom_point() +
    facet_wrap(~ sample)
 ```
 
-Now we look at both the number of UMIs and the nuclear fraction score, split by cell type:
+Both the number of UMIs and the nuclear fraction score can be split by cell type:
 ```{r qc-metrics-celltype, fig.width=6.5, fig.height=5}
 p1 <-
    ggplot(data = gbm,
@@ -143,42 +196,45 @@ p1
 p2
 ```
 
-The nuclear fraction scores are approximately normally distributed for each cell type. A value of +/- three standard deviations from the mean is a reasonable, if conservative, starting point for assigning thresholds. Here is an example of applying thresholds to the glioblastoma dataset:
-```{r apply-thresholds, fig.width=7.5, fig.height=5}
-# Define nuclear fraction thresholds
-thresholds <- tribble(
-   ~cell_type,  ~lower,  ~upper,
-   "endothelial", 0.05, 0.49,
-   "malignant", 0.05, 0.59,
-   "myeloid", 0.06, 0.56,
-   "oligodendrocyte", 0.09, 0.78,
-   "t_cell", 0.12, 0.67)
+Different cell types show different distributions for both the UMI count and nuclear fraction. When we run `identify_damaged_cells` we're looking for a population of cells with high nuclear fraction score and low RNA content - bottom right in the nuclear fraction vs. UMI count plot. The input to `identify_damaged_cells` should be the three-column data frame output by `identify_empty_drops` plus an additional column with cell type info:
 
-# Plot thresholds
-ggplot(gbm, aes(x=nuclear_fraction_droplet_qc, y=log10_umi_count, colour=flag)) +
-   geom_point() +
-   theme(legend.title=element_blank()) +
-   facet_wrap(~cell_type)+
-   geom_vline(data = thresholds, aes(xintercept = lower), linetype = "dashed") +
-   geom_vline(data = thresholds, aes(xintercept = upper), linetype = "dashed")
+```{r identify-damaged-cells}
+gbm.ed$cell_type <- gbm$cell_type
+head(gbm.ed)
+table(gbm.ed$cell_status)
+
+# Identify damaged cells
+gbm.ed.dc <- identify_damaged_cells(gbm.ed, verbose = FALSE, output_plots = TRUE)
 ```
-Using a combination of metrics, such as mitchondrial gene content, number of UMIs and the nuclear fraction score can often be helpful.
 
-It will usually be desirable to exclude empty droplets from your dataset. However, depending on the nature of your sample and your biological question, damaged cells may still retain plenty of useful information. In that case you may want to just mark these cells, keeping the metadata at hand throughout downstream analyses. 
+A list of length two is returned, containing; the original data frame with damaged cells marked:
+```{r damaged-cells-output}
+head(gbm.ed.dc[[1]])
+table(gbm.ed.dc[[1]]$cell_status)
+```
+and a named list of plots for each cell type:
+```{r plot-damaged-cells, fig.width=12, fig.height=12}
+wrap_plots(gbm.ed.dc[[2]], nrow = 5)
+```
+For each provided cell type the left plot marks barcodes called as cells or damaged cells - excluding any empty droplets. The remaining plots illustrate the Guassian distribution/s fit to the nculear fraction (centre) and log10(UMI count) (right) using expectation maximisation. Similar to the `identify_empty_drops` function, the `identify_damaged_cells` function inlcudes two rescue parameters; `nf_sep` and `umi_sep_perc`. For a population of barcodes to be called as damaged cells:
 
-It's difficult to provide guidance on where to place thresholds that will be applicable in every circumstance. However, before deciding to exclude a population of cells we recommend pausing to consider whether the data are consistent with your expectations and knowledge of the biology of each cell type in your sample:
+1. The mean of the distribution fit to the nuclear fraction (vertical solid red line) must be at least `nf_sep` (default 0.15) *greater* than the mean of the cell population - the threshold marked by the  dashed blue line
 
-* Does it make sense that a cluster of large malignant cells has a very low RNA content, or are they more likely to represent empty droplets?
+2. The mean of the distribution fit to the log10(UMI counts) (vertical solid red line) must be at least `umi_sep_perc` (default 50%) percent *less* than the mean of the cell population - threshold indicated by the dashed blue line
 
-* Should a cluster of t-cells which appears to be an outlier be excluded or do they just have a lower average RNA content?
+The ability to detect damaged cells will depend on the the accuracy of the cell type annotation. Different cell types or states can contain varying amounts of nuclear or total RNA, and may cause mixed populations of cells to be mislabeled as damaged.
 
-* Do the sensitive cell types in a brain sample, astrocytes and neurons, represent the majority of damaged cells?
+## Additional info
 
-Thinking through questions like these will be more fruitful than blindly following rules of thumb that may be inappropriate for your dataset or research question.
+# Excluding cells
+The `identify_empty_drops` and `identify_damaged_cells` functions mark provided barcodes as either; "empty_droplet", "damaged_cell" or "cell". 
 
+It will often be  desirable to exclude empty droplets from further analysis, but care should be taken that cell populations of interest with low nuclear fraction scores are not accidentally excluded. Clustering and visualisation combined with a knowledge of the cell types in your sample and relevant marker genes should help avoid this. 
 
-## Gene-level counts
-Note that if you have run a counting pipeline, such as [velocyto](http://velocyto.org/) to quantify spliced and unspliced counts, you already have the information you need to calculate the nuclear fraction. If for example you have run `velocyto run10x` you could use the following:
+Depending on the nature of your sample and biological question, populations of damaged cells may be critical to retain. In these cases, keeping cell labels as metadata throughout downstream analyses can assist in distinguishing the biological variation of interest from technical factors such as input sample quality.
+
+# Gene-level counts
+If you used a tool such as [velocyto](http://velocyto.org/) to quantify spliced and unspliced counts, you already have the information you need to calculate the nuclear fraction. If for example you have run `velocyto run10x` you could use the following:
 ```{python, python.reticulate = FALSE, eval=FALSE}
 import scanpy as sc
 
@@ -191,12 +247,10 @@ intron_sum = adata.layers['unspliced'].sum(axis=1)
 nuclear_fraction = intron_sum/(exon_sum + intron_sum)
 ```
 
-Counting pipelines like these are much more powerful, as they provide spliced and unspliced counts **per gene** as well as per cell barcode. This additional information allows you to perform further analyses, such as RNA velocity, that can take advantage of this additional information. The trade-off here is time - `dropletQC::nuclear_fraction_tags` ignores UMIs and gene-level information in order to calculate the nuclear fraction score quickly. Here is a comparison of the nuclear fraction scores calculated with `dropletQC::nuclear_fraction` *vs* the output from `velocyto`:
+Counting pipelines like these are much more powerful, as they provide spliced and unspliced counts **per gene** as well as per cell barcode. This additional information allows further analyses, such as RNA velocity, that can take advantage of this additional gene-level information. Here is a comparison of the nuclear fraction scores calculated with `dropletQC::nuclear_fraction` *vs* the output from `velocyto`:
 ```{r velocyto-dropletqc-comparison, message=FALSE, warning=FALSE, fig.width=5, fig.height=5}
 ggplot(data = qc_examples,
        aes(x = nuclear_fraction_droplet_qc, y = nuclear_fraction_velocyto)) +
    geom_point() +
    facet_wrap( ~ sample)
 ```
-
-As always, your choice of tool will depend on what you are trying to do. If you just want to calculate a nuclear fraction score for QC, this package should be sufficient. If you’re interested in looking at gene expression dynamics, a more sophisticated tool like `velocyto` will be required.

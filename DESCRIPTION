@@ -47,7 +47,8 @@ Imports:
     ks,
     ggpubr,
     mclust,
-    stringr
+    stringr,
+    patchwork
 Suggests: 
     knitr,
     rmarkdown

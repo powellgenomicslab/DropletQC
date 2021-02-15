@@ -36,7 +36,7 @@ There are two functions which can be used to calculate the nuclear
 fraction; `nuclear_fraction_tags` and `nuclear_fraction_annotation`.
 
 If your BAM file contains region tags which identify aligned reads as
-intronic or exonic, such as those produced by 10x Genomics’ CellRanger
+intronic or exonic, such as those produced by 10x Genomics’ Cell Ranger
 software, then the simplest and fastest way to calculate the nuclear
 fraction is to point `nuclear_fraction_tags` to the directory:
 
