@@ -8,7 +8,12 @@ identify_empty_drops(
   nf_umi,
   nf_rescue = 0.05,
   umi_rescue = 1000,
-  include_plot = FALSE
+  include_plot = FALSE,
+  plot_name = NULL,
+  plot_path = NULL,
+  plot_width = 18,
+  plot_height = 13,
+  pdf_png = "png"
 )
 }
 \arguments{
@@ -29,6 +34,18 @@ how the nuclear fraction threshold was identified and which barcodes have
 been called as empty droplets. In the plot of nuclear fraction vs log10(UMI
 counts), empty droplets are expected to occupy the lower left corner of the
 plot.}
+
+\item{plot_name}{character, if provided a plot will be saved with the
+provided name}
+
+\item{plot_path}{character, if provided a plot will be saved to the provided
+path}
+
+\item{plot_width}{numeric, plot width in cm}
+
+\item{plot_height}{numeric, plot height in cm}
+
+\item{pdf_png}{character, either "png" or "pdf"}
 }
 \value{
 data frame, the original data frame is returned plus an additional

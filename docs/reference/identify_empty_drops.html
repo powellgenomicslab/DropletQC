@@ -132,7 +132,12 @@ represent the population of empty droplets.</p>
   <span class='va'>nf_umi</span>,
   nf_rescue <span class='op'>=</span> <span class='fl'>0.05</span>,
   umi_rescue <span class='op'>=</span> <span class='fl'>1000</span>,
-  include_plot <span class='op'>=</span> <span class='cn'>FALSE</span>
+  include_plot <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  plot_name <span class='op'>=</span> <span class='cn'>NULL</span>,
+  plot_path <span class='op'>=</span> <span class='cn'>NULL</span>,
+  plot_width <span class='op'>=</span> <span class='fl'>18</span>,
+  plot_height <span class='op'>=</span> <span class='fl'>13</span>,
+  pdf_png <span class='op'>=</span> <span class='st'>"png"</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -163,6 +168,28 @@ how the nuclear fraction threshold was identified and which barcodes have
 been called as empty droplets. In the plot of nuclear fraction vs log10(UMI
 counts), empty droplets are expected to occupy the lower left corner of the
 plot.</p></td>
+    </tr>
+    <tr>
+      <th>plot_name</th>
+      <td><p>character, if provided a plot will be saved with the
+provided name</p></td>
+    </tr>
+    <tr>
+      <th>plot_path</th>
+      <td><p>character, if provided a plot will be saved to the provided
+path</p></td>
+    </tr>
+    <tr>
+      <th>plot_width</th>
+      <td><p>numeric, plot width in cm</p></td>
+    </tr>
+    <tr>
+      <th>plot_height</th>
+      <td><p>numeric, plot height in cm</p></td>
+    </tr>
+    <tr>
+      <th>pdf_png</th>
+      <td><p>character, either "png" or "pdf"</p></td>
     </tr>
     </table>
 

@@ -20,6 +20,13 @@
 #'   been called as empty droplets. In the plot of nuclear fraction vs log10(UMI
 #'   counts), empty droplets are expected to occupy the lower left corner of the
 #'   plot.
+#' @param plot_name character, if provided a plot will be saved with the
+#'   provided name
+#' @param plot_path character, if provided a plot will be saved to the provided
+#'   path
+#' @param plot_width numeric, plot width in cm
+#' @param plot_height numeric, plot height in cm
+#' @param pdf_png character, either "png" or "pdf"
 #'
 #' @return data frame, the original data frame is returned plus an additional
 #'   column identifying each barcode as a "cell" or "empty_droplet"
@@ -37,7 +44,13 @@ identify_empty_drops <-
   function(nf_umi,
            nf_rescue = 0.05,
            umi_rescue = 1000,
-           include_plot = FALSE) {
+           include_plot = FALSE,
+           plot_name = NULL,
+           plot_path = NULL,
+           plot_width=18,
+           plot_height=13,
+           pdf_png = "png"
+           ) {
 
     ## Check and parse arguments
     if (any(class(nf_umi) == "data.frame")) {
@@ -181,7 +194,18 @@ identify_empty_drops <-
     p.grid <- ggpubr::ggarrange(ggpubr::ggarrange(p1, p2, ncol = 2),
                                 nrow = 2,
                                 p3)
-    print(p.grid)
+    if(is.null(plot_path)){
+      print(p.grid)
+    } else {
+      ggplot2::ggsave(filename = plot_name,
+                      plot = p.grid,
+                      device = pdf_png,
+                      path = plot_path,
+                      width = plot_width,
+                      height = plot_height,
+                      units = "cm")
+    }
+
   }
 
   return(nf_umi)
