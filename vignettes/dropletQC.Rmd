@@ -154,6 +154,7 @@ This function tries to identify the population of empty droplets, but can fail i
 ```{r plot-empty-drops, fig.width=7, fig.height=5}
 gbm.ed <- identify_empty_drops(nf_umi=gbm.nf.umi, include_plot = TRUE)
 ```
+
 The top two plots illustrate the density estimate and its derivative, which is used to try and identify the "peak" in low-nuclear-fraction-score droplets. The `identify_empty_drops` function also includes two "rescue parameters"; `nf_rescue` and `umi_rescue` which can be adjusted if you think cells are being misidentified as empty droplets. Barcodes with a nuclear fraction score above `nf_rescue` (defualt 0.05) and UMI count above above `umi_rescue` (default 1000) are rescued from being marked as empty droplets:
 
 ```{r empty-drops-rescue-paramters, fig.width=7, fig.height=5}
@@ -167,6 +168,7 @@ gbm.ed <- identify_empty_drops(nf_umi=gbm.nf.umi,
                                nf_rescue = 0.0,umi_rescue = 10000,
                                include_plot = TRUE)
 ```
+
 The dashed blue lines in the bottom plot mark the positions of the two rescue parameters and which barcodes are called as cells and empty droplets.
 
 

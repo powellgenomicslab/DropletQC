@@ -223,13 +223,13 @@
 ## AAACCCACAGATGCGA-1    0.0000000000                   0.2919902
 ## AAACCCACAGGTGAGT-1    0.0000000000                   0.3295617
 ## AAACCCAGTCTTGCGG-1    0.0000000000                   0.3795893
-##                    nuclear_fraction_velocyto flag
-## AAACCCAAGGCGATAC-1                 0.2612048 cell
-## AAACCCAAGGCTGTAG-1                 0.3563123 cell
-## AAACCCACAAGTCCCG-1                 0.2012495 cell
-## AAACCCACAGATGCGA-1                 0.3429289 cell
-## AAACCCACAGGTGAGT-1                 0.3589220 cell
-## AAACCCAGTCTTGCGG-1                 0.3823998 cell</code></pre>
+##                    nuclear_fraction_velocyto         flag
+## AAACCCAAGGCGATAC-1                 0.2612048         cell
+## AAACCCAAGGCTGTAG-1                 0.3563123         cell
+## AAACCCACAAGTCCCG-1                 0.2012495         cell
+## AAACCCACAGATGCGA-1                 0.3429289         cell
+## AAACCCACAGGTGAGT-1                 0.3589220         cell
+## AAACCCAGTCTTGCGG-1                 0.3823998 damaged_cell</code></pre>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># How many cells in each dataset</span>
 <span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">qc_examples</span><span class="op">$</span><span class="va">sample</span><span class="op">)</span></code></pre></div>
@@ -280,7 +280,8 @@
 <p>This function tries to identify the population of empty droplets, but can fail if the population is very small or there are none. To check if the population of empty droplets has been identified correctly it can be instructive to visualise where the cut-off has been drawn:</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">gbm.ed</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/identify_empty_drops.html">identify_empty_drops</a></span><span class="op">(</span>nf_umi<span class="op">=</span><span class="va">gbm.nf.umi</span>, include_plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
-<p><img src="dropletQC_files/figure-html/plot-empty-drops-1.png" width="672"> The top two plots illustrate the density estimate and its derivative, which is used to try and identify the “peak” in low-nuclear-fraction-score droplets. The <code>identify_empty_drops</code> function also includes two “rescue parameters”; <code>nf_rescue</code> and <code>umi_rescue</code> which can be adjusted if you think cells are being misidentified as empty droplets. Barcodes with a nuclear fraction score above <code>nf_rescue</code> (defualt 0.05) and UMI count above above <code>umi_rescue</code> (default 1000) are rescued from being marked as empty droplets:</p>
+<p><img src="dropletQC_files/figure-html/plot-empty-drops-1.png" width="672"></p>
+<p>The top two plots illustrate the density estimate and its derivative, which is used to try and identify the “peak” in low-nuclear-fraction-score droplets. The <code>identify_empty_drops</code> function also includes two “rescue parameters”; <code>nf_rescue</code> and <code>umi_rescue</code> which can be adjusted if you think cells are being misidentified as empty droplets. Barcodes with a nuclear fraction score above <code>nf_rescue</code> (defualt 0.05) and UMI count above above <code>umi_rescue</code> (default 1000) are rescued from being marked as empty droplets:</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">gbm.ed</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/identify_empty_drops.html">identify_empty_drops</a></span><span class="op">(</span>nf_umi<span class="op">=</span><span class="va">gbm.nf.umi</span>,
                                nf_rescue <span class="op">=</span> <span class="fl">0.02</span>,umi_rescue <span class="op">=</span> <span class="fl">1000</span>,
@@ -295,7 +296,8 @@
 <code class="sourceCode R"><span class="va">gbm.ed</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/identify_empty_drops.html">identify_empty_drops</a></span><span class="op">(</span>nf_umi<span class="op">=</span><span class="va">gbm.nf.umi</span>,
                                nf_rescue <span class="op">=</span> <span class="fl">0.0</span>,umi_rescue <span class="op">=</span> <span class="fl">10000</span>,
                                include_plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
-<p><img src="dropletQC_files/figure-html/empty-drops-rescue-paramters-3.png" width="672"> The dashed blue lines in the bottom plot mark the positions of the two rescue parameters and which barcodes are called as cells and empty droplets.</p>
+<p><img src="dropletQC_files/figure-html/empty-drops-rescue-paramters-3.png" width="672"></p>
+<p>The dashed blue lines in the bottom plot mark the positions of the two rescue parameters and which barcodes are called as cells and empty droplets.</p>
 </div>
 <div id="identifying-damaged-cells" class="section level1">
 <h1 class="hasAnchor">
