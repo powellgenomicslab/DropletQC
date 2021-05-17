@@ -6,7 +6,7 @@ Authors@R:
            family = "Muskovic",
            role = c("aut", "cre"),
            email = "w.muskovic@gmail.com")
-BugReports: https://github.com/WalterMuskovic/DropletQC/issues
+BugReports: https://powellgenomicslab.github.io/DropletQC/issues
 Description: This simple R package can be used to calculate a useful QC metric 
     for single cell RNA-seq datasets generated with the 10x Genomics Chromium
     Single Cell Gene Expression platform: the nuclear fraction score. This score

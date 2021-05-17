@@ -106,12 +106,7 @@ are assumed to have equal variance (mclust model name &quot;EEI&quot;)." />
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        <li>
-  <a href="https://github.com/WalterMuskovic/DropletQC/">
-    <span class="fab fa-github fa-lg"></span>
-     
-  </a>
-</li>
+        
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -126,7 +121,7 @@ are assumed to have equal variance (mclust model name &quot;EEI&quot;)." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Identify damaged cells</h1>
-    <small class="dont-index">Source: <a href='https://github.com/WalterMuskovic/DropletQC/blob/master/R/identify_damaged_cells.R'><code>R/identify_damaged_cells.R</code></a></small>
+    
     <div class="hidden name"><code>identify_damaged_cells.Rd</code></div>
     </div>
 
@@ -196,7 +191,7 @@ with EM</p></td>
 frame with the same dimensions input to the <code>nf_umi_ed_ct</code> argument, with
 "damaged_cell" now recorded in the third column. The second element is NULL
 unless <code>output_plots</code>=TRUE. If requested, three plots are returned for each
-cell type in a named list, combined using <code><a href='https://rpkgs.datanovia.com/ggpubr/reference/ggarrange.html'>ggpubr::ggarrange</a></code>. For each
+cell type in a named list, combined using <code><a href='https://rdrr.io/pkg/ggpubr/man/ggarrange.html'>ggpubr::ggarrange</a></code>. For each
 cell type, the first plot illustrates the cell and damaged cell populations
 (if any) in a plot of nuclear fraction vs log10(UMI counts). Damaged cells
 are expected to be in the lower right portion of the plot(lower UMI counts
