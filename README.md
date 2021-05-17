@@ -56,7 +56,7 @@ head(nf1)
 ```
 
 Alternatively, you can point `nuclear_fraction_annotation` to a gene
-annotation, BAM and barcode files:
+annotation, BAM and barcode files: 
 
 ``` r
 nf2 <- nuclear_fraction_annotation(
