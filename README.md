@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# dropletQC
+# DropletQC
 
 <!-- badges: start -->
 <!-- badges: end -->
@@ -23,11 +23,11 @@ name “nuclear fraction”. This score can be used to help identify:
 
 ## Installation
 
-You can install dropletQC with:
+You can install DropletQC with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("WalterMuskovic/dropletQC", build_vignettes = TRUE)
+devtools::install_github("WalterMuskovic/DropletQC", build_vignettes = TRUE)
 ```
 
 ## Calculating the nuclear fraction
@@ -41,9 +41,9 @@ software, then the simplest and fastest way to calculate the nuclear
 fraction is to point `nuclear_fraction_tags` to the directory:
 
 ``` r
-library(dropletQC)
+library(DropletQC)
 nf1 <- nuclear_fraction_tags(
-    outs = system.file("extdata", "outs", package = "dropletQC"),
+    outs = system.file("extdata", "outs", package = "DropletQC"),
      tiles = 1, cores = 1, verbose = FALSE)
 head(nf1)
 #>                    nuclear_fraction
@@ -60,9 +60,9 @@ annotation, BAM and barcode files:
 
 ``` r
 nf2 <- nuclear_fraction_annotation(
- annotation_path = system.file("extdata/outs/chr1.gff3",package = "dropletQC"),
- bam = system.file("extdata/outs/possorted_genome_bam.bam",package = "dropletQC"),
- barcodes = system.file("extdata/outs/filtered_feature_bc_matrix/barcodes.tsv.gz",package = "dropletQC"),
+ annotation_path = system.file("extdata/outs/chr1.gff3",package = "DropletQC"),
+ bam = system.file("extdata/outs/possorted_genome_bam.bam",package = "DropletQC"),
+ barcodes = system.file("extdata/outs/filtered_feature_bc_matrix/barcodes.tsv.gz",package = "DropletQC"),
  tiles = 1, cores = 1, verbose = FALSE)
 head(nf2)
 #>                    nuclear_fraction
@@ -94,4 +94,4 @@ For a detailed discussion see our paper published in **Journal Name**:
 For more information about the functions included in the package,
 including tips on how to assess the nuclear fraction score using
 real-world examples, see the [package
-vignette](https://waltermuskovic.github.io/dropletQC/articles/dropletQC.html).
+vignette](https://waltermuskovic.github.io/DropletQC/articles/DropletQC.html).
