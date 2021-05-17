@@ -23,7 +23,7 @@ Description: This simple R package can be used to calculate a useful QC metric
     Genomics' Cell Ranger software.
 Maintainer: Walter Muskovic <w.muskovic@gmail.com>
 License: MIT + file LICENSE
-URL: https://waltermuskovic.github.io/DropletQC
+URL: https://powellgenomicslab.github.io/DropletQC/
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)

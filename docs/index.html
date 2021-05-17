@@ -108,7 +108,7 @@
 <p>There are two functions which can be used to calculate the nuclear fraction; <code>nuclear_fraction_tags</code> and <code>nuclear_fraction_annotation</code>.</p>
 <p>If your BAM file contains region tags which identify aligned reads as intronic or exonic, such as those produced by 10x Genomics’ Cell Ranger software, then the simplest and fastest way to calculate the nuclear fraction is to point <code>nuclear_fraction_tags</code> to the directory:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://waltermuskovic.github.io/DropletQC">DropletQC</a></span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://powellgenomicslab.github.io/DropletQC/">DropletQC</a></span><span class="op">)</span>
 <span class="va">nf1</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/nuclear_fraction_tags.html">nuclear_fraction_tags</a></span><span class="op">(</span>
     outs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"outs"</span>, package <span class="op">=</span> <span class="st">"DropletQC"</span><span class="op">)</span>,
      tiles <span class="op">=</span> <span class="fl">1</span>, cores <span class="op">=</span> <span class="fl">1</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
@@ -147,7 +147,7 @@
 <a href="#more-information" class="anchor"></a>More information</h2>
 <p>For a detailed discussion see our paper published in <strong>Journal Name</strong>:</p>
 <p><a href="https://www.google.com">paper title here</a></p>
-<p>For more information about the functions included in the package, including tips on how to assess the nuclear fraction score using real-world examples, see the <a href="https://waltermuskovic.github.io/DropletQC/articles/DropletQC.html">package vignette</a>.</p>
+<p>For more information about the functions included in the package, including tips on how to assess the nuclear fraction score using real-world examples, see the <a href="https://powellgenomicslab.github.io/DropletQC/articles/DropletQC.html">package vignette</a>.</p>
 </div>
 </div>
   </div>

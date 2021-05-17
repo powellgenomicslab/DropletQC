@@ -75,4 +75,4 @@ For a detailed discussion see our paper published in **Journal Name**:
 
 [paper title here](https://www.google.com)
 
-For more information about the functions included in the package, including tips on how to assess the nuclear fraction score using real-world examples, see the [package vignette](https://waltermuskovic.github.io/DropletQC/articles/DropletQC.html).
+For more information about the functions included in the package, including tips on how to assess the nuclear fraction score using real-world examples, see the [package vignette](https://powellgenomicslab.github.io/DropletQC/articles/DropletQC.html).
