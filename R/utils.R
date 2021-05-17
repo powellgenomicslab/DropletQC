@@ -15,8 +15,8 @@
 #'fails the first file check, an "error" is returned as the first value. If the
 #'file fails the second check a "warning" is returned as the first value. Note
 #'that the function was written as a simple helper function to be called
-#'internally by `dropletQC::nuclear_fraction_tags()` and
-#'`dropletQC::nuclear_fraction_annotation()` and isn't intended for more general
+#'internally by `DropletQC::nuclear_fraction_tags()` and
+#'`DropletQC::nuclear_fraction_annotation()` and isn't intended for more general
 #'use.
 #'
 #'@param bam_path character, bam_path should be a character vector pointing to

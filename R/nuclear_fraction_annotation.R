@@ -9,7 +9,7 @@
 #'  "pass", "warning" or error ; depending on whether all, some or nonw of the
 #'  sequences were found. The second element contains a message with more
 #'  details. Note that the function was written as a simple helper function to
-#'  be called `dropletQC::nuclear_fraction_annotation()` and isn't intended for
+#'  be called `DropletQC::nuclear_fraction_annotation()` and isn't intended for
 #'  more general use.
 #'
 #'@param bam_file character, should be a character vector pointing to the BAM
@@ -77,7 +77,7 @@ check_bam_anno <- function(bam_file, annotation){
 #'@description This function accepts an annotation as input and returns a
 #'  GrangesList containing; GRanges defining merged exons and introns. Note that
 #'  the function was written as a simple helper function to be called
-#'  `dropletQC::nuclear_fraction_annotation()` and isn't intended for more
+#'  `DropletQC::nuclear_fraction_annotation()` and isn't intended for more
 #'  general use.
 #'
 #'@param input_annotation character, should be a character vector pointing to
@@ -148,7 +148,7 @@ get_transcript_ranges <- function(input_annotation,
 #'   and returns an integer twice the length of the input cell barcode vector
 #'   containing; c(intron counts, exon counts), in the same order as the input
 #'   barcodes. Note that the function was written as a simple helper function to
-#'   be called `dropletQC::nuclear_fraction_annotation()` and isn't intended for
+#'   be called `DropletQC::nuclear_fraction_annotation()` and isn't intended for
 #'   more general use.
 #'
 #' @param block GRanges, contains merged exon and intron intervals
@@ -255,12 +255,12 @@ intron_exon_overlap <- function(block,
 #' @examples
 #' nf3 <- nuclear_fraction_annotation(
 #'  annotation_path = system.file("extdata/outs/chr1.gff3",
-#'   package = "dropletQC"),
+#'   package = "DropletQC"),
 #'  bam = system.file("extdata/outs/possorted_genome_bam.bam",
-#'   package = "dropletQC"),
+#'   package = "DropletQC"),
 #'  barcodes = system.file(
 #'  "extdata/outs/filtered_feature_bc_matrix/barcodes.tsv.gz",
-#'   package = "dropletQC"),
+#'   package = "DropletQC"),
 #'  tiles = 1, cores = 1, verbose = FALSE)
 #' head(nf3)
 #'

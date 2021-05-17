@@ -2,6 +2,6 @@ pandoc: 2.11.2
 pkgdown: 1.6.1
 pkgdown_sha: ~
 articles:
-  dropletQC: dropletQC.html
+  DropletQC: DropletQC.html
 last_built: 2021-02-18T03:23Z
 

@@ -23,7 +23,7 @@
 #'  the rows are in the same order as the input character vector of cell
 #'  barcodes. If there are no reads in the interval requested, the function will
 #'  return NULL. This function was written as a helper function to be called
-#'  internally by `dropletQC::nuclear_fraction_tags` and isn't intended for more
+#'  internally by `DropletQC::nuclear_fraction_tags` and isn't intended for more
 #'  general use.
 #'
 #'@keywords internal
@@ -149,13 +149,13 @@ parse_bam_tags <- function(interval,
 #'@examples
 #' nf1 <- nuclear_fraction_tags(
 #'     outs = system.file("extdata", "outs", package =
-#'     "dropletQC"),
+#'     "DropletQC"),
 #'      tiles = 1, cores = 1, verbose = FALSE)
 #' head(nf1)
 #'
 #' nf2 <- nuclear_fraction_tags(
 #'    bam = system.file("extdata", "outs","possorted_genome_bam.bam", package =
-#'    "dropletQC"),
+#'    "DropletQC"),
 #'    barcodes = c("AAAAGTCACTTACTTG-1",
 #'                 "AAAAGTGGATCTCTAA-1",
 #'                 "AAACACGTTCTCATCG-1"),

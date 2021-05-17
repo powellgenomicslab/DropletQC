@@ -1,8 +1,8 @@
 ---
-title: "dropletQC"
+title: "DropletQC"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{dropletQC}
+  %\VignetteIndexEntry{DropletQC}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -37,14 +37,14 @@ sapply(1:2, function(x)
            ))[[1]]$tag)
 ```
 
-The nuclear fraction score returned by `nuclear_fraction_tags` for a Cell Ranger BAM file would be E/(E+N) for each provided cell barcode. To speed up the processing of the (usually large) BAM file, dropletQC splits the file into a number of genomic tiles and processes them in parallel by internally calling `furrr::future_map`. By default, 100 tiles are used and `future::availableCores() - 1` cores.
+The nuclear fraction score returned by `nuclear_fraction_tags` for a Cell Ranger BAM file would be E/(E+N) for each provided cell barcode. To speed up the processing of the (usually large) BAM file, DropletQC splits the file into a number of genomic tiles and processes them in parallel by internally calling `furrr::future_map`. By default, 100 tiles are used and `future::availableCores() - 1` cores.
 
 There are two main ways to call `nuclear_fraction_tags`. If you used Cell Ranger for alignment, you can point it to the Cell Ranger ‘outs’ directory.  This takes advantage of the consistent file names and structure of the ‘outs’:
 ```{r example1, message=FALSE, warning=FALSE}
-library(dropletQC)
+library(DropletQC)
 
 nf1 <- nuclear_fraction_tags(
-   outs = system.file("extdata", "outs", package = "dropletQC"),
+   outs = system.file("extdata", "outs", package = "DropletQC"),
    tiles = 1,
    cores = 1,
    verbose = FALSE
@@ -52,14 +52,14 @@ nf1 <- nuclear_fraction_tags(
 head(nf1)
 
 # This assumes the following three files are present in the specified directory:
-list.files(system.file("extdata", "outs", package = "dropletQC"),
+list.files(system.file("extdata", "outs", package = "DropletQC"),
            recursive = TRUE)
 ```
 
 If you don’t have this directory structure, or your files have been renamed, you can specify paths to the required files directly:
 ```{r example2, message=FALSE, warning=FALSE}
 nf2 <- nuclear_fraction_tags(
-   bam = system.file("extdata", "outs", "possorted_genome_bam.bam", package ="dropletQC"),
+   bam = system.file("extdata", "outs", "possorted_genome_bam.bam", package ="DropletQC"),
    barcodes = c(
       "AAAAGTCACTTACTTG-1",
       "AAAAGTGGATCTCTAA-1",
@@ -79,9 +79,9 @@ Note that here we have provided a vector of requested barcode IDs to the barcode
 If your BAM file doesn't contain region tags you can use the `nuclear_fraction_annotation` function and provide a gene annotation file. Each read in the BAM file will be assessed for overlap with exon and intron ranges extracted from the provided annotation. The genome build and chromosome names in the annotation should match the BAM file.
 
 ```{r example3, message=FALSE, warning=FALSE}
-nf3 <- nuclear_fraction_annotation(annotation_path = system.file("extdata/outs/chr1.gff3",  package = "dropletQC"),
-                                   bam = system.file("extdata/outs/possorted_genome_bam.bam",  package = "dropletQC"),
-                                   barcodes = system.file( "extdata/outs/filtered_feature_bc_matrix/barcodes.tsv.gz",package = "dropletQC"),
+nf3 <- nuclear_fraction_annotation(annotation_path = system.file("extdata/outs/chr1.gff3",  package = "DropletQC"),
+                                   bam = system.file("extdata/outs/possorted_genome_bam.bam",  package = "DropletQC"),
+                                   barcodes = system.file( "extdata/outs/filtered_feature_bc_matrix/barcodes.tsv.gz",package = "DropletQC"),
                                    tiles = 1, cores = 1, verbose = FALSE)
 head(nf3)
 ```
@@ -249,7 +249,7 @@ intron_sum = adata.layers['unspliced'].sum(axis=1)
 nuclear_fraction = intron_sum/(exon_sum + intron_sum)
 ```
 
-Counting pipelines like these are much more powerful, as they provide spliced and unspliced counts **per gene** as well as per cell barcode. This additional information allows further analyses, such as RNA velocity, that can take advantage of this additional gene-level information. Here is a comparison of the nuclear fraction scores calculated with `dropletQC::nuclear_fraction` *vs* the output from `velocyto`:
+Counting pipelines like these are much more powerful, as they provide spliced and unspliced counts **per gene** as well as per cell barcode. This additional information allows further analyses, such as RNA velocity, that can take advantage of this additional gene-level information. Here is a comparison of the nuclear fraction scores calculated with `DropletQC::nuclear_fraction` *vs* the output from `velocyto`:
 ```{r velocyto-dropletqc-comparison, message=FALSE, warning=FALSE, fig.width=5, fig.height=5}
 ggplot(data = qc_examples,
        aes(x = nuclear_fraction_droplet_qc, y = nuclear_fraction_velocyto)) +
