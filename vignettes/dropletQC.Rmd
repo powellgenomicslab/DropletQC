@@ -21,7 +21,7 @@ library(GenomicRanges)
 # Create a reference to the BAM file
 bam_file <-
    BamFile(system.file("extdata", "outs", "possorted_genome_bam.bam",
-                       package = "dropletQC"))
+                       package = "DropletQC"))
 
 # Define some genomic intervals to pull data from
 intervals <- GRanges(seqnames = "chr1",

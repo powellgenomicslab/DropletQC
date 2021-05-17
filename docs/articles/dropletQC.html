@@ -5,14 +5,14 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>dropletQC • dropletQC</title>
+<title>DropletQC • DropletQC</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="dropletQC">
-<meta property="og:description" content="dropletQC">
+<script src="../pkgdown.js"></script><meta property="og:title" content="DropletQC">
+<meta property="og:description" content="DropletQC">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -30,7 +30,7 @@
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="../index.html">dropletQC</a>
+        <a class="navbar-link" href="../index.html">DropletQC</a>
         <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.0.9000</span>
       </span>
     </div>
@@ -44,7 +44,7 @@
   </a>
 </li>
 <li>
-  <a href="../articles/dropletQC.html">Get started</a>
+  <a href="../articles/DropletQC.html">Get started</a>
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
@@ -52,7 +52,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/WalterMuskovic/dropletQC/">
+  <a href="https://github.com/WalterMuskovic/DropletQC/">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -67,14 +67,14 @@
 
       
 
-      </header><script src="dropletQC_files/header-attrs-2.6/header-attrs.js"></script><div class="row">
+      </header><script src="dropletQC_files/header-attrs-2.8/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1 data-toc-skip>dropletQC</h1>
+      <h1 data-toc-skip>DropletQC</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/WalterMuskovic/dropletQC/blob/master/vignettes/dropletQC.Rmd"><code>vignettes/dropletQC.Rmd</code></a></small>
-      <div class="hidden name"><code>dropletQC.Rmd</code></div>
+      <small class="dont-index">Source: <a href="https://github.com/WalterMuskovic/DropletQC/blob/master/vignettes/DropletQC.Rmd"><code>vignettes/DropletQC.Rmd</code></a></small>
+      <div class="hidden name"><code>DropletQC.Rmd</code></div>
 
     </div>
 
@@ -95,7 +95,7 @@
 <span class="co"># Create a reference to the BAM file</span>
 <span class="va">bam_file</span> <span class="op">&lt;-</span>
    <span class="fu"><a href="https://rdrr.io/pkg/Rsamtools/man/BamFile-class.html">BamFile</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"outs"</span>, <span class="st">"possorted_genome_bam.bam"</span>,
-                       package <span class="op">=</span> <span class="st">"dropletQC"</span><span class="op">)</span><span class="op">)</span>
+                       package <span class="op">=</span> <span class="st">"DropletQC"</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co"># Define some genomic intervals to pull data from</span>
 <span class="va">intervals</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/GenomicRanges/man/GRanges-class.html">GRanges</a></span><span class="op">(</span>seqnames <span class="op">=</span> <span class="st">"chr1"</span>,
@@ -112,13 +112,13 @@
 <pre><code>##    [,1]                 [,2]                
 ## CB "TAGCTCACTGCTGCCA-1" "ACTTTTCCTTACCGAG-1"
 ## RE "E"                  "N"</code></pre>
-<p>The nuclear fraction score returned by <code>nuclear_fraction_tags</code> for a Cell Ranger BAM file would be E/(E+N) for each provided cell barcode. To speed up the processing of the (usually large) BAM file, dropletQC splits the file into a number of genomic tiles and processes them in parallel by internally calling <code><a href="https://rdrr.io/pkg/furrr/man/future_map.html">furrr::future_map</a></code>. By default, 100 tiles are used and <code>future::availableCores() - 1</code> cores.</p>
+<p>The nuclear fraction score returned by <code>nuclear_fraction_tags</code> for a Cell Ranger BAM file would be E/(E+N) for each provided cell barcode. To speed up the processing of the (usually large) BAM file, DropletQC splits the file into a number of genomic tiles and processes them in parallel by internally calling <code><a href="https://rdrr.io/pkg/furrr/man/future_map.html">furrr::future_map</a></code>. By default, 100 tiles are used and <code>future::availableCores() - 1</code> cores.</p>
 <p>There are two main ways to call <code>nuclear_fraction_tags</code>. If you used Cell Ranger for alignment, you can point it to the Cell Ranger ‘outs’ directory. This takes advantage of the consistent file names and structure of the ‘outs’:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://waltermuskovic.github.io/dropletQC">dropletQC</a></span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://waltermuskovic.github.io/DropletQC">DropletQC</a></span><span class="op">)</span>
 
 <span class="va">nf1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nuclear_fraction_tags.html">nuclear_fraction_tags</a></span><span class="op">(</span>
-   outs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"outs"</span>, package <span class="op">=</span> <span class="st">"dropletQC"</span><span class="op">)</span>,
+   outs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"outs"</span>, package <span class="op">=</span> <span class="st">"DropletQC"</span><span class="op">)</span>,
    tiles <span class="op">=</span> <span class="fl">1</span>,
    cores <span class="op">=</span> <span class="fl">1</span>,
    verbose <span class="op">=</span> <span class="cn">FALSE</span>
@@ -133,7 +133,7 @@
 ## AAGCAGGGGTCGCGAA-1        0.3929376</code></pre>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># This assumes the following three files are present in the specified directory:</span>
-<span class="fu"><a href="https://rdrr.io/r/base/list.files.html">list.files</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"outs"</span>, package <span class="op">=</span> <span class="st">"dropletQC"</span><span class="op">)</span>,
+<span class="fu"><a href="https://rdrr.io/r/base/list.files.html">list.files</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"outs"</span>, package <span class="op">=</span> <span class="st">"DropletQC"</span><span class="op">)</span>,
            recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] "chr1.gff3"                                 
 ## [2] "filtered_feature_bc_matrix/barcodes.tsv.gz"
@@ -142,7 +142,7 @@
 <p>If you don’t have this directory structure, or your files have been renamed, you can specify paths to the required files directly:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">nf2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nuclear_fraction_tags.html">nuclear_fraction_tags</a></span><span class="op">(</span>
-   bam <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"outs"</span>, <span class="st">"possorted_genome_bam.bam"</span>, package <span class="op">=</span><span class="st">"dropletQC"</span><span class="op">)</span>,
+   bam <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"outs"</span>, <span class="st">"possorted_genome_bam.bam"</span>, package <span class="op">=</span><span class="st">"DropletQC"</span><span class="op">)</span>,
    barcodes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span>
       <span class="st">"AAAAGTCACTTACTTG-1"</span>,
       <span class="st">"AAAAGTGGATCTCTAA-1"</span>,
@@ -164,9 +164,9 @@
 <a href="#using-a-gene-annotation" class="anchor"></a>Using a gene annotation</h2>
 <p>If your BAM file doesn’t contain region tags you can use the <code>nuclear_fraction_annotation</code> function and provide a gene annotation file. Each read in the BAM file will be assessed for overlap with exon and intron ranges extracted from the provided annotation. The genome build and chromosome names in the annotation should match the BAM file.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">nf3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nuclear_fraction_annotation.html">nuclear_fraction_annotation</a></span><span class="op">(</span>annotation_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata/outs/chr1.gff3"</span>,  package <span class="op">=</span> <span class="st">"dropletQC"</span><span class="op">)</span>,
-                                   bam <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata/outs/possorted_genome_bam.bam"</span>,  package <span class="op">=</span> <span class="st">"dropletQC"</span><span class="op">)</span>,
-                                   barcodes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span> <span class="st">"extdata/outs/filtered_feature_bc_matrix/barcodes.tsv.gz"</span>,package <span class="op">=</span> <span class="st">"dropletQC"</span><span class="op">)</span>,
+<code class="sourceCode R"><span class="va">nf3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nuclear_fraction_annotation.html">nuclear_fraction_annotation</a></span><span class="op">(</span>annotation_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata/outs/chr1.gff3"</span>,  package <span class="op">=</span> <span class="st">"DropletQC"</span><span class="op">)</span>,
+                                   bam <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata/outs/possorted_genome_bam.bam"</span>,  package <span class="op">=</span> <span class="st">"DropletQC"</span><span class="op">)</span>,
+                                   barcodes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span> <span class="st">"extdata/outs/filtered_feature_bc_matrix/barcodes.tsv.gz"</span>,package <span class="op">=</span> <span class="st">"DropletQC"</span><span class="op">)</span>,
                                    tiles <span class="op">=</span> <span class="fl">1</span>, cores <span class="op">=</span> <span class="fl">1</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">nf3</span><span class="op">)</span></code></pre></div>
 <pre><code>##                    nuclear_fraction
@@ -358,7 +358,7 @@
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">gbm.ed.dc</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">cell_status</span><span class="op">)</span></code></pre></div>
 <pre><code>## 
 ##          cell  damaged_cell empty_droplet 
-##          4760           539           217</code></pre>
+##          4759           540           217</code></pre>
 <p>and a named list of plots for each cell type:</p>
 <div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html">wrap_plots</a></span><span class="op">(</span><span class="va">gbm.ed.dc</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>, nrow <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></code></pre></div>
@@ -392,7 +392,7 @@
 <span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>exon_sum <span class="op">=</span> adata.layers[<span class="st">'spliced'</span>].<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>)</span>
 <span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>intron_sum <span class="op">=</span> adata.layers[<span class="st">'unspliced'</span>].<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>)</span>
 <span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>nuclear_fraction <span class="op">=</span> intron_sum<span class="op">/</span>(exon_sum <span class="op">+</span> intron_sum)</span></code></pre></div>
-<p>Counting pipelines like these are much more powerful, as they provide spliced and unspliced counts <strong>per gene</strong> as well as per cell barcode. This additional information allows further analyses, such as RNA velocity, that can take advantage of this additional gene-level information. Here is a comparison of the nuclear fraction scores calculated with <code>dropletQC::nuclear_fraction</code> <em>vs</em> the output from <code>velocyto</code>:</p>
+<p>Counting pipelines like these are much more powerful, as they provide spliced and unspliced counts <strong>per gene</strong> as well as per cell barcode. This additional information allows further analyses, such as RNA velocity, that can take advantage of this additional gene-level information. Here is a comparison of the nuclear fraction scores calculated with <code>DropletQC::nuclear_fraction</code> <em>vs</em> the output from <code>velocyto</code>:</p>
 <div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">qc_examples</span>,
        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">nuclear_fraction_droplet_qc</span>, y <span class="op">=</span> <span class="va">nuclear_fraction_velocyto</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>

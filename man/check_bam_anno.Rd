@@ -30,7 +30,7 @@ character vector with two elements. The first element contains either
 "pass", "warning" or error ; depending on whether all, some or nonw of the
 sequences were found. The second element contains a message with more
 details. Note that the function was written as a simple helper function to
-be called \code{dropletQC::nuclear_fraction_annotation()} and isn't intended for
+be called \code{DropletQC::nuclear_fraction_annotation()} and isn't intended for
 more general use.
 }
 \keyword{internal}

@@ -38,7 +38,7 @@ A character vector describing the BAM tag which contains the cell barcode
 and returns an integer twice the length of the input cell barcode vector
 containing; c(intron counts, exon counts), in the same order as the input
 barcodes. Note that the function was written as a simple helper function to
-be called \code{dropletQC::nuclear_fraction_annotation()} and isn't intended for
+be called \code{DropletQC::nuclear_fraction_annotation()} and isn't intended for
 more general use.
 }
 \keyword{internal}

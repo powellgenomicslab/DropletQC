@@ -102,13 +102,13 @@ containing cellranger output (outs).
 \examples{
 nf1 <- nuclear_fraction_tags(
     outs = system.file("extdata", "outs", package =
-    "dropletQC"),
+    "DropletQC"),
      tiles = 1, cores = 1, verbose = FALSE)
 head(nf1)
 
 nf2 <- nuclear_fraction_tags(
    bam = system.file("extdata", "outs","possorted_genome_bam.bam", package =
-   "dropletQC"),
+   "DropletQC"),
    barcodes = c("AAAAGTCACTTACTTG-1",
                 "AAAAGTGGATCTCTAA-1",
                 "AAACACGTTCTCATCG-1"),

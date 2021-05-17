@@ -35,7 +35,7 @@ intervals.
 This function accepts an annotation as input and returns a
 GrangesList containing; GRanges defining merged exons and introns. Note that
 the function was written as a simple helper function to be called
-\code{dropletQC::nuclear_fraction_annotation()} and isn't intended for more
+\code{DropletQC::nuclear_fraction_annotation()} and isn't intended for more
 general use.
 }
 \keyword{internal}

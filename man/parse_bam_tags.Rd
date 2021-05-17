@@ -30,7 +30,7 @@ cell barcode and "intron" - the number of reads that map to introns, where
 the rows are in the same order as the input character vector of cell
 barcodes. If there are no reads in the interval requested, the function will
 return NULL. This function was written as a helper function to be called
-internally by \code{dropletQC::nuclear_fraction_tags} and isn't intended for more
+internally by \code{DropletQC::nuclear_fraction_tags} and isn't intended for more
 general use.
 }
 \description{

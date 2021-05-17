@@ -68,12 +68,12 @@ information needs to be calculated.
 \examples{
 nf3 <- nuclear_fraction_annotation(
  annotation_path = system.file("extdata/outs/chr1.gff3",
-  package = "dropletQC"),
+  package = "DropletQC"),
  bam = system.file("extdata/outs/possorted_genome_bam.bam",
-  package = "dropletQC"),
+  package = "DropletQC"),
  barcodes = system.file(
  "extdata/outs/filtered_feature_bc_matrix/barcodes.tsv.gz",
-  package = "dropletQC"),
+  package = "DropletQC"),
  tiles = 1, cores = 1, verbose = FALSE)
 head(nf3)
 

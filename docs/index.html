@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Calculate Nuclear Fraction Score • dropletQC</title>
+<title>Calculate Nuclear Fraction Score • DropletQC</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="bootstrap-toc.css">
 <script src="bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
@@ -43,7 +43,7 @@
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="index.html">dropletQC</a>
+        <a class="navbar-link" href="index.html">DropletQC</a>
         <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.0.9000</span>
       </span>
     </div>
@@ -57,7 +57,7 @@
   </a>
 </li>
 <li>
-  <a href="articles/dropletQC.html">Get started</a>
+  <a href="articles/DropletQC.html">Get started</a>
 </li>
 <li>
   <a href="reference/index.html">Reference</a>
@@ -65,7 +65,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/WalterMuskovic/dropletQC/">
+  <a href="https://github.com/WalterMuskovic/DropletQC/">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -108,7 +108,7 @@
 <p>There are two functions which can be used to calculate the nuclear fraction; <code>nuclear_fraction_tags</code> and <code>nuclear_fraction_annotation</code>.</p>
 <p>If your BAM file contains region tags which identify aligned reads as intronic or exonic, such as those produced by 10x Genomics’ Cell Ranger software, then the simplest and fastest way to calculate the nuclear fraction is to point <code>nuclear_fraction_tags</code> to the directory:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://waltermuskovic.github.io/dropletQC">dropletQC</a></span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">dropletQC</span><span class="op">)</span>
 <span class="va">nf1</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/nuclear_fraction_tags.html">nuclear_fraction_tags</a></span><span class="op">(</span>
     outs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"outs"</span>, package <span class="op">=</span> <span class="st">"dropletQC"</span><span class="op">)</span>,
      tiles <span class="op">=</span> <span class="fl">1</span>, cores <span class="op">=</span> <span class="fl">1</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
@@ -156,9 +156,9 @@
     <div class="links">
 <h2>Links</h2>
 <ul class="list-unstyled">
-<li>Browse source code at <br><a href="https://github.com/WalterMuskovic/dropletQC/">https://​github.com/​WalterMuskovic/​dropletQC/​</a>
+<li>Browse source code at <br><a href="https://github.com/WalterMuskovic/DropletQC/">https://​github.com/​WalterMuskovic/​DropletQC/​</a>
 </li>
-<li>Report a bug at <br><a href="https://github.com/WalterMuskovic/dropletQC/issues">https://​github.com/​WalterMuskovic/​dropletQC/​issues</a>
+<li>Report a bug at <br><a href="https://github.com/WalterMuskovic/DropletQC/issues">https://​github.com/​WalterMuskovic/​DropletQC/​issues</a>
 </li>
 </ul>
 </div>

@@ -26,7 +26,7 @@ from DropletUtils::emptyDrops output}
 \item{empty_drops_fdr}{FDR values returned from DropletUtils::emptyDrops
 output}
 \item{nuclear_fraction_droplet_qc}{nuclear fraction metric calculated with
-dropletQC}
+DropletQC}
 \item{nuclear_fraction_velocyto}{nuclear fraction metric calculated using
 the output from velocyto}
 \item{flag}{assigned cell status, taking one of three values; cell,
