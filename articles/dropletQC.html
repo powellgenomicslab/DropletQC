@@ -117,7 +117,7 @@
 <p>The nuclear fraction score returned by <code>nuclear_fraction_tags</code> for a Cell Ranger BAM file would be E/(E+N) for each provided cell barcode. To speed up the processing of the (usually large) BAM file, DropletQC splits the file into a number of genomic tiles and processes them in parallel by internally calling <code><a href="https://rdrr.io/pkg/furrr/man/future_map.html">furrr::future_map</a></code>. By default, 100 tiles are used and <code>future::availableCores() - 1</code> cores.</p>
 <p>There are two main ways to call <code>nuclear_fraction_tags</code>. If you used Cell Ranger for alignment, you can point it to the Cell Ranger ‘outs’ directory. This takes advantage of the consistent file names and structure of the ‘outs’:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://waltermuskovic.github.io/DropletQC">DropletQC</a></span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://powellgenomicslab.github.io/DropletQC/">DropletQC</a></span><span class="op">)</span>
 
 <span class="va">nf1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nuclear_fraction_tags.html">nuclear_fraction_tags</a></span><span class="op">(</span>
    outs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"outs"</span>, package <span class="op">=</span> <span class="st">"DropletQC"</span><span class="op">)</span>,
@@ -360,7 +360,7 @@
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">gbm.ed.dc</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">cell_status</span><span class="op">)</span></code></pre></div>
 <pre><code>## 
 ##          cell  damaged_cell empty_droplet 
-##          4759           540           217</code></pre>
+##          4760           539           217</code></pre>
 <p>and a named list of plots for each cell type:</p>
 <div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html">wrap_plots</a></span><span class="op">(</span><span class="va">gbm.ed.dc</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>, nrow <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></code></pre></div>
