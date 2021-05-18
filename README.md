@@ -27,7 +27,7 @@ You can install DropletQC with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("WalterMuskovic/DropletQC", build_vignettes = TRUE)
+devtools::install_github("powellgenomicslab/DropletQC", build_vignettes = TRUE)
 ```
 
 ## Calculating the nuclear fraction
@@ -89,7 +89,8 @@ cells are flagged, not removed.
 
 For a detailed discussion see our paper published in **Journal Name**:
 
-[paper title here](https://www.google.com)
+[DropletQC: improved identification of empty droplets and damaged cells
+in single-cell RNA-seq data](https://www.google.com)
 
 For more information about the functions included in the package,
 including tips on how to assess the nuclear fraction score using
