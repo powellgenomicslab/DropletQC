@@ -74,7 +74,7 @@ head(nf2)
 #> AAGCAGGGGTCGCGAA-1        0.3929376
 ```
 
-This methods is more flexible, as it makes no assumptions about how your
+This method is more flexible, as it makes no assumptions about how your
 BAM file was produced - but it will take longer. Take care that the
 provided barcodes match the barcode structure in the BAM file.
 
@@ -87,10 +87,10 @@ cells are flagged, not removed.
 
 ## More information
 
-For a detailed discussion see our paper published in **Journal Name**:
+For a detailed discussion see our manuscript:
 
 [DropletQC: improved identification of empty droplets and damaged cells
-in single-cell RNA-seq data](https://www.google.com)
+in single-cell RNA-seq data](https://doi.org/10.1101/2021.08.02.454717)
 
 For more information about the functions included in the package,
 including tips on how to assess the nuclear fraction score using
